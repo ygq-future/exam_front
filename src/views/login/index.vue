@@ -64,7 +64,9 @@
 </template>
 
 <script>
-import api from '@/api/login'
+import api from '@/api/user'
+import { mapActions, mapGetters } from 'vuex'
+import cookies from "vue-cookies"
 
 export default {
   data() {
@@ -74,15 +76,27 @@ export default {
       },
     }
   },
+  mounted() {
+    let userCookie = cookies.get("user")
+    if(this.user || userCookie) {
+      this.$router.replace('/')
+    }
+  },
   methods: {
+    ...mapActions(["setUser"]),
     login() {
       api.login(this.form).then(res => {
         this.$message.success(res.message)
-        console.log(res)
+        this.setUser(res.data)
+        cookies.set("user", JSON.stringify(res.data))
+        this.$router.replace('/')
       })
     },
     register() {
-      console.log(this.form)
+      api.teacherRegister(this.form).then(res => {
+        this.$message.success(res.message)
+        this.changeLogin()
+      })
     },
     changeLogin() {
       this.form = {rememberMe: false}
@@ -97,6 +111,9 @@ export default {
       this.$refs.right.style.opacity = 1
     },
   },
+  computed: {
+    ...mapGetters(["user"])
+  }
 }
 </script>
 
