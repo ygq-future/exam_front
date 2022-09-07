@@ -1,6 +1,6 @@
 import axios from 'axios'
 import router from '@/router'
-
+import { Message as message } from 'element-ui';
 const service = axios.create({
   timeout: 12000,
   baseURL: "/api"
