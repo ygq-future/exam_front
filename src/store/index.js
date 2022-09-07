@@ -11,9 +11,6 @@ export default new Vuex.Store({
     userInfo(state) {
       return state.user?.userInfo
     },
-    userRole(state) {
-      return state.user?.roles
-    },
     user(state) {
       return state.user
     }

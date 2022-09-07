@@ -87,8 +87,10 @@ export default {
     login() {
       api.login(this.form).then(res => {
         this.$message.success(res.message)
-        this.setUser(res.data)
-        cookies.set("user", JSON.stringify(res.data))
+        let user = res.data
+        delete user.roles
+        this.setUser(user)
+        cookies.set("user", JSON.stringify(user))
         this.$router.replace('/')
       })
     },

@@ -105,7 +105,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['userInfo', 'userRole', 'user']),
+    ...mapGetters(['userInfo', 'user']),
   },
 }
 </script>
