@@ -1,12 +1,17 @@
-import http from '@/util/http'
+import http from "@/util/http";
 
 export default {
-    getList(params){
-        console.log(params);
-        return http({
-            method:'get',
-            url:'/student',
-            params
-        })
-    }
-}
+  getList(params) {
+    return http({
+      method: "get",
+      url: "/student",
+      params,
+    });
+  },
+  lock(studentId) {
+    return http({
+        method:'patch',
+        url:`/student/reverseLock/${studentId}`
+    });
+  },
+};

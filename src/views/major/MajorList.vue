@@ -3,7 +3,7 @@
     <!-- 提示框 -->
     <div>
       <!-- 添加专业选项框 -->
-      <el-dialog title="添加专业" :visible.sync="majorDS.statue" center width="50vmin">
+      <el-dialog custom-class="dialog" title="添加专业" :visible.sync="majorDS.statue" center width="50vmin">
         <el-input v-model="majorDS.input" placeholder="请输入专业名称"></el-input>
         <span slot="footer" class="dialog-footer">
           <el-button @click="majorDS.statue = false">取 消</el-button>
@@ -12,7 +12,7 @@
       </el-dialog>
 
       <!-- 添加班级按钮弹窗 -->
-      <el-dialog title="添加班级" :visible.sync="classDS.statue" width="50vmin" center>
+      <el-dialog custom-class="dialog" title="添加班级" :visible.sync="classDS.statue" width="50vmin" center>
         <el-row>
           <!-- 专业选择器 -->
           <el-select v-model="classDS.data.majorId" clearable placeholder="请选择专业" style="width:100%">
@@ -89,7 +89,6 @@
 <script setup>
 import { reactive, ref, provide } from "vue";
 import major from "@/api/major";
-import { Message as message } from 'element-ui';
 
 //专业和班级的数据
 const majorData = reactive({ data: [] });
