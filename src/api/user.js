@@ -17,8 +17,14 @@ export default {
   teacherRegister(data) {
     return http({
       method: 'post',
-      url: '/teacher/register',
+      url: '/teacher',
       data 
+    })
+  },
+  userInfo() {
+    return http({
+      method: 'get',
+      url: "/user/info"
     })
   }
 }

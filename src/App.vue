@@ -11,8 +11,18 @@ body{
 * {
   box-sizing: border-box;
 }
-body{
-  padding: 0;
+
+body {
   margin: 0;
+  padding: 0;
+}
+
+.dialog {
+  border-radius: 15px !important;
+  overflow: hidden;
+}
+
+.el-dialog__body {
+  padding-bottom: 0 !important;
 }
 </style>
