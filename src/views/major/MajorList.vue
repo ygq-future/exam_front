@@ -3,7 +3,7 @@
     <!-- 提示框 -->
     <div>
       <!-- 添加专业选项框 -->
-      <el-dialog custom-class="dialog" title="添加专业" :visible.sync="majorDS.statue" center width="50vmin">
+      <el-dialog custom-class="dialog" title="添加专业" :visible.sync="majorDS.statue" center width="50vmin" :close-on-click-modal="false">
         <el-input v-model="majorDS.input" placeholder="请输入专业名称"></el-input>
         <span slot="footer" class="dialog-footer">
           <el-button @click="majorDS.statue = false">取 消</el-button>
@@ -12,7 +12,7 @@
       </el-dialog>
 
       <!-- 添加班级按钮弹窗 -->
-      <el-dialog custom-class="dialog" title="添加班级" :visible.sync="classDS.statue" width="50vmin" center>
+      <el-dialog custom-class="dialog" title="添加班级" :visible.sync="classDS.statue" width="50vmin" center :close-on-click-modal="false">
         <el-row>
           <!-- 专业选择器 -->
           <el-select v-model="classDS.data.majorId" clearable placeholder="请选择专业" style="width:100%">
@@ -30,7 +30,7 @@
       </el-dialog>
 
       <!-- 修改班级选项框 -->
-      <el-dialog title="修改班级信息" :visible.sync="classEdit.statue" center width="50vmin">
+      <el-dialog title="修改班级信息" :visible.sync="classEdit.statue" center width="50vmin" :close-on-click-modal="false" custom-class="dialog">
         <el-input v-model="classEdit.data.name" placeholder="请输入要修改的名称"></el-input>
         <span slot="footer" class="dialog-footer">
           <el-button @click="classEdit.statue = false">取 消</el-button>
@@ -39,7 +39,7 @@
       </el-dialog>
 
       <!-- 修改专业选项框 -->
-      <el-dialog title="修改专业信息" :visible.sync="majorEdit.statue" center width="50vmin">
+      <el-dialog title="修改专业信息" :visible.sync="majorEdit.statue" center width="50vmin" :close-on-click-modal="false" custom-class="dialog">
         <el-input v-model="majorEdit.data.name" placeholder="请输入专业名称"></el-input>
         <span slot="footer" class="dialog-footer">
           <el-button @click="majorEdit.statue = false">取 消</el-button>
