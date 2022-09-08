@@ -33,7 +33,7 @@
         <span>题目管理</span>
       </template>
       <el-menu-item index="/question-list">题目列表</el-menu-item>
-      <el-menu-item index="/question-edit">编辑题目</el-menu-item>
+      <!-- <el-menu-item index="/question-edit">编辑题目</el-menu-item> -->
     </el-submenu>
 
     <el-submenu index="paper">
