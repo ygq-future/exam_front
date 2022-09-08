@@ -1,8 +1,11 @@
 <template>
   <el-menu
+    :default-openeds="openeds"
+    :collapse-transition="false"
     router
     :collapse="isCollapse"
-    :class="[isCollapse ? 'auto' : 'normal']">
+    :class="[isCollapse ? 'auto' : 'normal']"
+  >
     <div class="collapse" @click="isCollapse = !isCollapse">
       <i class="el-icon-set-up"></i>
     </div>
@@ -73,6 +76,15 @@
 export default {
   data() {
     return {
+      openeds: [
+        'teacher',
+        'major',
+        'question',
+        'paper',
+        'student',
+        'statistics',
+        'system',
+      ],
       isCollapse: false,
     }
   },
@@ -111,7 +123,10 @@ export default {
   width: 200px;
 }
 
-.el-menu--collapse, .el-menu, .el-submenu__title, .el-submenu {
+.el-menu--collapse,
+.el-menu,
+.el-submenu__title,
+.el-submenu {
   transition: 0.5s all;
 }
 </style>

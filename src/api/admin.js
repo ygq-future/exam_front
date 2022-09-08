@@ -32,5 +32,29 @@ export default {
       method: 'post',
       url: '/authority/refreshUri'
     })
+  },
+  accounts() {
+    return http({
+      method: 'get',
+      url: '/user/accounts'
+    })
+  },
+  offline(login) {
+    return http({
+      method: 'post',
+      url: '/admin/offline/' + login
+    })
+  },
+  applyList() {
+    return http({
+      method: "get",
+      url: "/teacher-major"
+    })
+  },
+  reverseStatus(id) {
+    return http({
+      method: "patch",
+      url: "/teacher-major/reverseStatus/" + id
+    })
   }
 }
