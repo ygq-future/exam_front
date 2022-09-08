@@ -8,7 +8,8 @@ module.exports = {
   devServer: {
     proxy: {
       '/api': {
-        target: 'https://47.101.63.12/exam_api', // 代理目标的基础路径
+        target:'http://192.168.31.73:80',
+        // target: 'https://47.101.63.12/exam_api', // 代理目标的基础路径
         // target: 'http://localhost:80', // 代理目标的基础路径
         changeOrigin: true,
         pathRewrite: { '^/api': '' }
