@@ -31,6 +31,7 @@
         </el-main>
         <el-footer>
             <!-- 页脚分页区域 -->
+            <!-- FIXME: 分页查询问题 -->
             <el-footer height="50">
                 <el-pagination style="text-align: center;" background layout="total, sizes, prev, pager, next, jumper"
                     :total="page.total" :current-page="page.current" :page-size="page.size" 
@@ -59,7 +60,7 @@ export default {
     methods: {
         //请求数据
         async getData() {
-            //TODO: 请求教师列表异常
+            //FIXME: 请求教师列表异常
             const res = await teacher.getList({...this.page})
             this.teachList =  res.data.rows
             this.page = ({...res.data})
