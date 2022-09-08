@@ -14,8 +14,7 @@ body {
   padding: 0;
   font-family:Verdana, Geneva, Tahoma, sans-serif;
 }
-
-.dialog {
+.el-dialog {
   border-radius: 15px !important;
   overflow: hidden;
 }
