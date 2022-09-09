@@ -1,74 +1,71 @@
 <template>
-  <div>
-    <el-container>
-      <el-header height="60">
-        <el-row :gutter="20">
-          <el-col :span="5">
-            <!--两个选项框 -->
-            <el-select v-model="query.majorId" placeholder="请选择专业" filterable clearable @change="majorChange">
-              <el-option v-for="item in majorData" :key="item.id" :label="item.name" :value="item.id"> </el-option>
-            </el-select>
-          </el-col>
-          <!-- 班级选项卡 -->
-          <el-col :span="5">
-            <el-select v-model="query.clazzId" placeholder="请选择班级" filterable clearable @change="getStudent">
-              <el-option v-for="item in children" :key="item.id" :label="item.name" :value="item.id"> </el-option>
-            </el-select>
-          </el-col>
+  <el-container>
+    <el-header height="60">
+      <el-row :gutter="20">
+        <el-col :span="5">
+          <!--两个选项框 -->
+          <el-select v-model="query.majorId" placeholder="请选择专业" filterable clearable @change="majorChange">
+            <el-option v-for="item in majorData" :key="item.id" :label="item.name" :value="item.id"> </el-option>
+          </el-select>
+        </el-col>
+        <!-- 班级选项卡 -->
+        <el-col :span="5">
+          <el-select v-model="query.clazzId" placeholder="请选择班级" filterable clearable @change="getStudent">
+            <el-option v-for="item in children" :key="item.id" :label="item.name" :value="item.id"> </el-option>
+          </el-select>
+        </el-col>
 
-          <el-col :span="8">
-            <el-input clearable placeholder="请输入关键字" v-model="query.keyword" @input="searchStudent">
-              <template slot="prepend">关键字查找</template>
-            </el-input>
-          </el-col>
-        </el-row>
-      </el-header>
+        <el-col :span="8">
+          <el-input clearable placeholder="请输入关键字" v-model="query.keyword" @input="searchStudent">
+            <template slot="prepend">关键字查找</template>
+          </el-input>
+        </el-col>
+      </el-row>
+    </el-header>
 
-      <!-- 页面表格区域 -->
-      <el-main height="100%">
-        <el-table :data="studentList" style="width: 100%" border stripe max-height="580">
-          <el-table-column prop="studentNo" label="学号" width="180" align="center" style="boder: none">
-          </el-table-column>
-          <el-table-column prop="name" label="姓名" width="180" align="center"> </el-table-column>
-          <el-table-column prop="clazzName" label="班级" width="200" align="center"> </el-table-column>
-          <el-table-column prop="majorName" label="专业" align="center" width="180"> </el-table-column>
-          <el-table-column label="账号状态" align="center">
-            <template slot-scope="scope">
-              <el-tag type="info" v-show="scope.row.locked !== 0">已锁定</el-tag>
-              <el-tag v-show="scope.row.locked === 0">未锁定</el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" align="center">
-            <template slot-scope="scope">
-              <el-button type="danger" size="small" v-show="scope.row.locked === 0" @click="lock(scope.row.id)"
-                >锁定账户</el-button
-              >
+    <!-- 页面表格区域 -->
+    <el-main height="100%">
+      <el-table :data="studentList" style="width: 100%" border stripe height="550">
+        <el-table-column prop="studentNo" label="学号" width="180" align="center" style="boder: none">
+        </el-table-column>
+        <el-table-column prop="name" label="姓名" width="180" align="center"> </el-table-column>
+        <el-table-column prop="clazzName" label="班级" width="200" align="center"> </el-table-column>
+        <el-table-column prop="majorName" label="专业" align="center" width="180"> </el-table-column>
+        <el-table-column label="账号状态" align="center">
+          <template slot-scope="scope">
+            <el-tag type="info" v-show="scope.row.locked !== 0">已锁定</el-tag>
+            <el-tag v-show="scope.row.locked === 0">未锁定</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="center">
+          <template slot-scope="scope">
+            <el-button type="danger" size="small" v-show="scope.row.locked === 0" @click="lock(scope.row.id)"
+              >锁定账户</el-button
+            >
 
-              <el-button type="success" size="small" v-show="scope.row.locked !== 0" @click="lock(scope.row.id)"
-                >解锁账户</el-button
-              >
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-main>
+            <el-button type="success" size="small" v-show="scope.row.locked !== 0" @click="lock(scope.row.id)"
+              >解锁账户</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-main>
 
-      <!-- 页脚分页区域 -->
-      <el-footer height="50">
-        <el-pagination
-          style="text-align: center"
-          background
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="page.total"
-          :current-page="page.current"
-          :page-size="page.size"
-          :page-sizes="[10, 20, 30, 50]"
-          @current-change="pageNumberChange"
-          @size-change="changeSize"
-        >
-        </el-pagination>
-      </el-footer>
-    </el-container>
-  </div>
+    <!-- 页脚分页区域 -->
+    <el-footer height="50">
+      <el-pagination
+        style="text-align: center"
+        background
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="page.total"
+        :current-page="page.current"
+        :page-size="page.size"
+        @current-change="pageNumberChange"
+        @size-change="changeSize"
+      >
+      </el-pagination>
+    </el-footer>
+  </el-container>
 </template>
 <script>
 import student from '@/api/student'
@@ -102,7 +99,7 @@ export default {
   methods: {
     searchStudent() {
       clearTimeout(this.timer)
-      this.timer = setTimeout(() => {
+      setTimeout(() => {
         this.page.current = 1
         this.getStudent()
       }, 300)
@@ -134,6 +131,7 @@ export default {
         this.studentList = res.data.rows
         this.page.total = res.data.total
         this.page.pages = res.data.pages
+        this.page.current = res.data.current
       })
     },
 
