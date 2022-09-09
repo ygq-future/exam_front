@@ -1,17 +1,42 @@
 import http from '@/util/http'
 
 export default {
-    getList(data){
+    getList(params){
         return http({
             url:'/question',
             method:'get',
-            data
+            params
         })
     },
+    //获取类型
     getType(){
         return http.get('/question-type')
     },
+    //根据ID查询
     queryByID:id=>(http({
         url:`/question/${id}`
-    }))
+    })),
+    //修改选择题选项
+    editQuestion(id,data){
+        return http({
+            url:`select-question/${id}`,
+            method:'patch',
+            data
+        })
+    },
+    //删除选项
+    delQuestion(id){
+        return http({
+            url:`select-question/${id}`,
+            method:'delete'
+        })
+    },
+    //添加选择性
+    addQuestion(data){
+        return http({
+            url:'/select-question',
+            method:'post',
+            data
+        })
+    }
 }
