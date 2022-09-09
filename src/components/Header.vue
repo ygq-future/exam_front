@@ -42,16 +42,16 @@
 
     <el-form label-width="60px">
       <el-form-item label="名称">
-        <el-input :value="user.userInfo.name" disabled/>
+        <el-input :value="user?.userInfo?.name" disabled/>
       </el-form-item>
       <el-form-item label="用户名">
-        <el-input :value="user.username" disabled/>
+        <el-input :value="user?.username" disabled/>
       </el-form-item>
-      <el-form-item label="工号" v-if="user.type == 1">
-        <el-input :value="user.userInfo.teacherNo" disabled/>
+      <el-form-item label="工号" v-if="user?.type == 1">
+        <el-input :value="user?.userInfo?.teacherNo" disabled/>
       </el-form-item>
       <el-form-item label="身份">
-        <el-input :value="user.type == 0 ? '管理员' : '教师'" disabled/>
+        <el-input :value="user?.type == 0 ? '管理员' : '教师'" disabled/>
       </el-form-item>
     </el-form>
 

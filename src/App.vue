@@ -19,6 +19,11 @@ body {
   overflow: hidden;
 }
 
+.el-popconfirm__action {
+  display: flex;
+  justify-content: space-around;
+}
+
 .el-dialog__body {
   padding-bottom: 0 !important;
 }
