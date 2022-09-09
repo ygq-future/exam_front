@@ -1,21 +1,21 @@
 <template>
   <el-container>
     <el-header height="60">
-      <el-row :gutter="20">
-        <el-col :span="5">
+      <el-row :gutter="10">
+        <el-col :span="4">
           <!--两个选项框 -->
           <el-select v-model="query.majorId" placeholder="请选择专业" filterable clearable @change="majorChange">
             <el-option v-for="item in majorData" :key="item.id" :label="item.name" :value="item.id"> </el-option>
           </el-select>
         </el-col>
         <!-- 班级选项卡 -->
-        <el-col :span="5">
+        <el-col :span="4">
           <el-select v-model="query.clazzId" placeholder="请选择班级" filterable clearable @change="getStudent">
             <el-option v-for="item in children" :key="item.id" :label="item.name" :value="item.id"> </el-option>
           </el-select>
         </el-col>
 
-        <el-col :span="8">
+        <el-col :span="7">
           <el-input clearable placeholder="请输入关键字" v-model="query.keyword" @input="searchStudent">
             <template slot="prepend">关键字查找</template>
           </el-input>

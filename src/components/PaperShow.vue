@@ -1,38 +1,49 @@
 <template>
-  <div class="box" :style="{'height': height ? height : '450px'}">
+  <div class="box" :style="{ height: height ? height : '450px' }">
     <el-empty description="题目为空,快去添加题目吧" v-if="Object.keys(questions).length === 0"></el-empty>
-    <div class="type" v-for="(item, index) in questions" :key="index">
-      <div class="title">{{ index }}</div>
+
+    <div class="type" v-for="type in types" :key="type.id" v-if="questions[type.name]">
+      <div class="title">{{ type.name }}</div>
       <el-divider></el-divider>
 
       <div class="list">
-        <div class="item" v-for="(child, cidx) in item" :key="child.id">
+        <div class="item" v-for="(item, idx) in questions[type.name]" :key="item.id">
           <!-- question title -->
           <div style="margin-bottom: 10px">
-            {{ `${cidx + 1}、 ${child.title}` }}
+            {{ `${idx + 1}、 ${item.title}` }}
           </div>
 
           <!-- singleton select -->
-          <div class="selects" v-if="child.typeId === 1">
-            <div v-for="(select, sidx) in child.selects" :key="sidx">
+          <div class="selects" v-if="item.typeId === 1">
+            <div v-for="(select, sidx) in item.selects" :key="sidx">
               {{ `${items[sidx]}、` }}
-              <el-tag :type="child.answer == select.id ? 'success' : 'info'">{{ select.description }}</el-tag>
+              <el-tag :type="item.answer == select.id ? 'success' : 'info'">{{ select.description }}</el-tag>
             </div>
           </div>
 
           <!-- more select -->
-          <div class="selects" v-if="child.typeId === 2">
-            <div v-for="(select, sidx) in child.selects" :key="sidx">
+          <div class="selects" v-if="item.typeId === 2">
+            <div v-for="(select, sidx) in item.selects" :key="sidx">
               {{ `${items[sidx]}、` }}
-              <el-tag :type="child.answer.split(',').includes(select.id + '') ? 'success' : 'info'">{{
+              <el-tag :type="item.answer.split(',').includes(select.id + '') ? 'success' : 'info'">{{
                 select.description
               }}</el-tag>
             </div>
           </div>
 
           <!-- fill question -->
-          <div v-if="child.typeId === 3">
-            答案: <el-tag type="success">{{ child.answer }}</el-tag>
+          <div v-if="item.typeId === 3">
+            答案: <el-tag type="success">{{ item.answer }}</el-tag>
+          </div>
+
+          <!-- if question -->
+          <div v-if="item.typeId === 4">
+            答案: <el-tag type="success">{{ item.answer == '1' ? '正确' : '错误' }}</el-tag>
+          </div>
+
+          <!-- answer question -->
+          <div v-if="item.typeId === 5">
+            示例答案: <el-tag type="success">{{ item.answer }}</el-tag>
           </div>
         </div>
       </div>
@@ -41,17 +52,39 @@
 </template>
 
 <script>
+import api from '@/api/question'
+
 export default {
-  props: ["questions", "height"],
+  props: ['questions', 'height'],
   data() {
     return {
-      items: ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+      items: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+      types: []
+    }
+  },
+  mounted() {
+    this.getTypes()
+  },
+  methods: {
+    getTypes() {
+      api.getType().then(res => {
+        this.types = res.data
+      })
+      0
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.list {
+  padding: 0 20px;
+
+  .item {
+    margin-bottom: 20px;
+  }
+}
+
 .selects {
   padding-left: 20px;
 
@@ -65,7 +98,7 @@ export default {
 .box {
   width: 100%;
   height: 450px;
-  overflow: scroll;
+  overflow: auto;
   display: flex;
   flex-direction: column;
   padding: 20px 0;

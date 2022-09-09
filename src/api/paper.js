@@ -33,5 +33,12 @@ export default {
       url: '/exam/' + data.id,
       data
     })
+  },
+  relateQues(data) {
+    return http({
+      method: "post",
+      url: "/exam-question",
+      data
+    })
   }
 }
