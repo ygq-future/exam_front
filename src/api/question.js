@@ -38,5 +38,13 @@ export default {
             method:'post',
             data
         })
+    },
+    changeQuestion(data){
+        console.log(data);
+        return http({
+            url:`question/${data.id}`,
+            method:'put',
+            data
+        })
     }
 }

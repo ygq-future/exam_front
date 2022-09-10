@@ -1,7 +1,7 @@
-<!-- 选择题类型表单 -->
+<!-- 表单模版(失败但经验) -->
 <template>
   <el-dialog
-    :visible="formData.choiceState"
+    :visible="formState.choiceState"
     :close-on-click-modal="false"
     center
     width="90vmin"
@@ -20,23 +20,28 @@
               <i class="el-icon-plus el-icon--right"></i>
             </el-button>
           </div>
-          <!-- 标题编辑区域 -->
+          <!-- 题目编辑区域 -->
           <el-input type="textarea" placeholder="请输入题目描述" v-model="questionData.title" />
         </div>
       </el-header>
       <!-- 表单区域 -->
       <el-main>
-        <el-table border style="width: 100%" :data="questionData.selects" height="40vmin" :row-class-name="isAnswer">
+        <el-table
+          border
+          style="width: 100%"
+          :data="questionData.selects"
+          height="40vmin"
+          ref="multipleTable"
+          @selection-change="handleSelectionChange"
+          :row-class-name="ifLight"
+        >
+          <el-table-column width="50" align="center" type="selection" />
           <el-table-column label="选项" width="50" align="center">
             <template slot-scope="scope">
               {{ createIndex(scope.$index, scope.row) }}
             </template>
           </el-table-column>
-          <el-table-column label="是否为答案" width="100" align="center">
-            <template slot-scope="scope">
-              <el-checkbox v-model="scope.row.isAnswer"></el-checkbox>
-            </template>
-          </el-table-column>
+
           <el-table-column prop="description" label="描述">
             <template slot-scope="scope">
               <span v-show="scope.row.edit == false">{{ scope.row.description }}</span>
@@ -60,7 +65,7 @@
       </el-main>
     </el-container>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="formData.choiceState = false">取消修改</el-button>
+      <el-button @click="formState.choiceState = false">取消修改</el-button>
       <el-button type="primary" @click="put">确认修改</el-button>
     </span>
   </el-dialog>
@@ -72,37 +77,59 @@ import question from "@/api/question";
 export default {
   data: () => ({
     state: false,
+    checkList: [],
     questionData: {
       selects: [],
+      answer: [],
     },
   }),
-  inject: ["formData"],
+  inject: ["formState"],
   methods: {
+    handleSelectionChange(val) {
+      let ids = val.map((item) => item.id) || [];
+      this.questionData.answer = ids.join(",");
+    },
+    //提交
     put() {
       console.log(this.questionData);
     },
+    toggleSelection(rows) {
+      if (rows) {
+        rows.forEach((row) => {
+          this.$refs.multipleTable.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.multipleTable.clearSelection();
+      }
+    },
+    //
     //根据ID查找题目
     async queryById() {
-      const res = await question.queryByID(this.formData.id);
-      //答案数组
+      const res = await question.queryByID(this.formState.id);
+      //答案
       const answer = res.data.answer.split(",").map(Number);
-
-      //给所有的题目选项加上一个标志
+      console.log(answer);
+      //给查询到的答案加上勾
       for (let item of res.data.selects) {
+        //判断是否是答案,是答案加上一个高亮标识
         if (answer.some((e) => e === item.id)) {
-          item.isAnswer = true;
+          item.light = true;
         }
         //标识是否在编辑状态
         item.edit = false;
       }
       //返回处理后的数据
       this.questionData = res.data;
-      //   console.log(this.questionData);
-      console.log("发送了数据");
+      //   this.toggleSelection(answers)
+    },
+    ifLight({ row }) {
+      if (row.light) {
+        return "success-row";
+      }
+      return "";
     },
     async init() {
       await this.queryById();
-      // console.log(this.questionData);
     },
     //修改题目信息
     async edit(row) {
@@ -129,17 +156,12 @@ export default {
       await question.delQuestion(id);
       this.queryById();
     },
-    //判断该行是否是答案
-    isAnswer({ row, rowIndex }) {
-      if (row.isAnswer) return "success-row";
-      return "";
-    },
     //添加选项
     addQuestionOption() {
       const params = {
         description: "",
         questionId: this.questionData.id,
-        isAnswer: false,
+        Answer: false,
         edit: true,
         // itemId:
       };
@@ -152,7 +174,7 @@ export default {
     },
     //弹窗消失后清除数据
     clean() {
-      this.formData.choiceState = false;
+      this.formState.choiceState = false;
       this.questionData = {
         selects: [],
       };
@@ -178,8 +200,9 @@ export default {
     }
   }
   textarea {
-    height: 10vmin;
-    max-height: 20vmin;
+    // height: 10vmin;
+    max-height: 10vmin;
+    font-size: 1rem;
   }
 }
 .el-table .success-row {

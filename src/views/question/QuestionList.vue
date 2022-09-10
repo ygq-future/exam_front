@@ -1,50 +1,51 @@
 <template>
-  <el-container>
-    <el-header>
-      <el-row :gutter="10">
-        <el-col :span="4">
-          <el-button>添加题目</el-button>
-        </el-col>
-        <el-col :span="5">
-          <!-- 题目类型选择器 -->
-          <el-select v-model="page.typeId" placeholder="请选择题目类型">
+  <el-container class="question">
+    <el-header height="30">
+      <div class="input-menu">
+        <el-input placeholder="根据关键字查询题目" v-model="page.keyword" class="input-with-select" @change="getDataList">
+          <el-select slot="prepend" v-model="page.typeId" placeholder="请选择题目类型" @change="getDataList">
+            <el-option label="全部" :value="null" />
             <el-option v-for="item in questionType" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
-        </el-col>
-
-        <el-col :span="8">
-          <el-input v-model="page.keyword" placeholder="根据关键字查询"></el-input>
-        </el-col>
-      </el-row>
+          <el-button slot="append" icon="el-icon-search"></el-button>
+        </el-input>
+      </div>
+      <div class="menu">
+        <el-button type="primary">添加题目</el-button>
+      </div>
     </el-header>
     <!-- 题目表格区域 -->
     <el-main>
-      <el-table :data="dataList" border>
+      <el-table :data="dataList" border height="70vh">
         <el-table-column prop="id" label="ID" width="50" align="center"></el-table-column>
         <el-table-column prop="typeName" label="题目类型" width="100" align="center"></el-table-column>
         <el-table-column prop="title" label="题目标题"></el-table-column>
-        <!-- TODO:答案 -->
-        <el-table-column prop="answer" label="答案">
-          <!-- <template slot-scope=""></template> -->
-        </el-table-column>
-        <el-table-column label="操作" align="center">
+        <el-table-column label="答案">
           <template slot-scope="scope">
-            <el-button size="small" @click="chooseTheForm(scope.row)">修改题目</el-button>
-            <el-button size="small" type="danger">删除题目</el-button>
+            {{ scope.row.answer }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" align="center" width="250">
+          <template slot-scope="scope">
+            <!-- 通过题目类型决定打开哪一个表单 -->
+            <div class="buttons">
+              <!-- 表单按钮 -->
+              <SingleChoice :id='scope.row.id' v-show="scope.row.typeId === 1" />
+              <MultipleChoice :id="scope.row.id" v-show="scope.row.typeId === 2" />
+              <el-button size="small" type="danger">删除题目</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
     </el-main>
-    <el-footer>
-    </el-footer>
-    <ChoiceForm></ChoiceForm>
+    <el-footer> </el-footer>
   </el-container>
 </template>
 
 <script>
 import question from "@/api/question";
-import ChoiceForm from "./form/ChoiceForm.vue";
-
+import MultipleChoice from "./form/MultipleChoice.vue";
+import SingleChoice from "./form/SingleChoice.vue";
 export default {
   data: () => ({
     dataList: [],
@@ -56,21 +57,8 @@ export default {
       sortType: "desc",
       keyword: "",
     },
-    //题目类型
     questionType: [],
-    //题目ID
-    //选择题类型的参数
-    formData: {
-      choiceState: false,
-      topicState: false,
-      id:0
-    },
   }),
-  provide(){
-    return{
-      formData: this.formData,
-    }
-  },
   methods: {
     //获取题目列表
     async getDataList() {
@@ -84,22 +72,10 @@ export default {
       //设置数据
       this.dataList = res.data.rows;
     },
-
     // 获取全部题目类型
     async getType() {
       const res = await question.getType();
       this.questionType = res.data;
-    },
-    //根据题目类型判断需要打开哪个表单
-    async chooseTheForm(row) {
-      //用typeId匹配对应的弹出框
-      const choice = [1, 2];
-      const topic = [3, 4];
-      // 将ID传递给子组件
-      this.formData.id = row.id
-      // 点击的时候就会将题目的ID,之后判断打开哪个表单
-      if (choice.some((e) => e == row.typeId)) this.formData.choiceState = true;
-      else if (topic.some((e) => e == row.typeId)) this.formData.topicState = true;
     },
   },
   //页面初始化事件
@@ -107,6 +83,30 @@ export default {
     this.getType();
     this.getDataList();
   },
-  components: { ChoiceForm },
+  components: { MultipleChoice, SingleChoice },
 };
 </script>
+<style scoped lang="scss">
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+.question {
+  .el-header {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    .menu {
+      display: flex;
+      gap: 10px;
+    }
+  }
+}
+.input-menu {
+  width: 70vmin;
+  .el-select{
+    width: 15vmin;
+  }
+}
+</style>
