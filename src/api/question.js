@@ -40,6 +40,14 @@ export default {
       data
     })
   },
+  changeQuestion(data) {
+    console.log(data)
+    return http({
+      url: `question/${data.id}`,
+      method: 'put',
+      data
+    })
+  },
   //批量导入题目到试卷
   batchImport(data) {
     return http({
