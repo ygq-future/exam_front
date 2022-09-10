@@ -36,8 +36,15 @@ export default {
   },
   relateQues(data) {
     return http({
-      method: "post",
-      url: "/exam-question",
+      method: 'post',
+      url: '/exam-question',
+      data
+    })
+  },
+  cancelQues(data) {
+    return http({
+      method: 'delete',
+      url: '/exam-question',
       data
     })
   }
