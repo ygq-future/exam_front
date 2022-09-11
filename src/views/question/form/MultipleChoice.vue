@@ -8,15 +8,16 @@
       </template>
       <template #options>
         <el-input v-model="questionData.score" placeholder="题目分数"> </el-input>
+        <el-button @click="toggleSelection()">TEST</el-button>
       </template>
       <el-table
         :row-class-name="lightLine"
         border
         style="width: 100%"
-        :data="questionData.selects"
+        :data="dataList"
         height="40vmin"
         ref="multipleTable"
-        @selection-change="handleSelectionChange"
+        @selection-change="select"
       >
         <el-table-column width="50" align="center" type="selection" />
         <el-table-column label="选项" width="50" align="center">
@@ -56,9 +57,8 @@ import question from "@/api/question";
 export default {
   props: ["id"],
   data: () => ({
-    questionData: {
-      selects: [],
-    },
+    questionData: {},
+    dataList: [],
     visible: false,
   }),
   methods: {
@@ -68,6 +68,10 @@ export default {
       //拿到处理后的数据
       const res = await util.queryById(this.id);
       this.questionData = res;
+      this.dataList = res.selects;
+      this.$nextTick(() => {
+        this.toggleSelection();
+      });
     },
     createIndex(index, row) {
       return util.createIndex(index, row);
@@ -105,9 +109,10 @@ export default {
         row.edit = false;
       }
     },
+
     //表单新加行方法
     addLine() {
-      if (this.questionData.selects.length > 6) {
+      if (this.dataList.length > 6) {
         this.$message({
           message: "已经添加到最大选项了!不可再添加了",
           type: "warning",
@@ -127,33 +132,40 @@ export default {
       this.visible = false;
     },
     async submit() {
-      await question.changeQuestion({...this.questionData})
-      await this.init()
-      this.close()
-      this.$emit('update')
+      await question.changeQuestion({ ...this.questionData });
+      await this.init();
+      this.close();
+      this.$emit("update");
     },
     handleSelectionChange(val) {
       let ids = val.map((item) => item.id) || [];
       this.questionData.answer = ids.join(",");
     },
-    lightLine({ row, rowIndex }) {
+    lightLine({ row }) {
       const answer = this.parsingAnswer();
       if (answer.some((e) => e === row.id)) {
         return "warning-row";
       }
       return "";
     },
+    //获取答案数组
     parsingAnswer() {
       return this.questionData.answer.split(",").map(Number);
     },
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach((row) => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
-      }
+    toggleSelection() {
+      const answer = this.parsingAnswer();
+      this.dataList.forEach((e) => {
+        if (answer.some((n) => e.id === n)) {
+          this.$refs.multipleTable.toggleRowSelection(e);
+        }
+      });
+    },
+    select(all) {
+      const ids = []
+      all.forEach(e => {
+        ids.push(e.id)
+      })
+      this.questionData.answer = ids.toString()
     },
   },
   components: { Matrix },
@@ -161,6 +173,6 @@ export default {
 </script>
 <style>
 .el-table .warning-row {
-  background: oldlace;
+  background: #7fc0502e;
 }
 </style>

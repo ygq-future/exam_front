@@ -99,11 +99,6 @@ export default {
   components: { Matrix },
 };
 </script>
-<style>
-.el-table .warning-row {
-  background: oldlace;
-}
-</style>
 <style scoped lang="scss">
 .form {
   text-align: left;

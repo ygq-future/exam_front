@@ -92,11 +92,7 @@ export default {
   components: { Matrix },
 };
 </script>
-<style>
-.el-table .warning-row {
-  background: oldlace;
-}
-</style>
+
 <style scoped lang="scss">
 .btns {
   margin: 20px 0;
