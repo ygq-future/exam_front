@@ -39,7 +39,6 @@ export default {
       //拿到处理后的数据
       const res = await question.queryByID(this.id);
       this.questionData = res.data;
-      console.log(res);
     },
     createIndex(index, row) {
       return util.createIndex(index, row);
@@ -73,7 +72,6 @@ export default {
       }
       //如果表单咩有时间属性,则走新加选项方法
       else {
-        // console.log(12);
         await question.addQuestion({ ...item });
       }
     },

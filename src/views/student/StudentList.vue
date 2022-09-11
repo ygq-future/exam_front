@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container v-loading="loading">
     <el-header height="60">
       <el-row :gutter="10">
         <el-col :span="4">
@@ -72,6 +72,7 @@ import student from '@/api/student'
 import major from '@/api/major'
 export default {
   data: () => ({
+    loading: false,
     majorData: [],
     studentList: [],
     page: {
@@ -126,12 +127,14 @@ export default {
       if (this.query.clazzId === '') delete query.clazzId
       if (this.query.keyword === '') delete query.keyword
 
+      this.loading = true
       //处理返回的数据
       student.getList(query).then(res => {
         this.studentList = res.data.rows
         this.page.total = res.data.total
         this.page.pages = res.data.pages
         this.page.current = res.data.current
+        this.loading = false
       })
     },
 

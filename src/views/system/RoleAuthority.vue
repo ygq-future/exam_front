@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div class="content" v-loading="loading">
     <el-button type="primary" size="small" style="margin-bottom: 15px"
        @click="refreshAuth">刷新权限</el-button
     >
@@ -39,6 +39,7 @@ import api from '@/api/admin'
 export default {
   data() {
     return {
+      loading: false,
       roles: [],
       auths: [],
     }
@@ -75,8 +76,10 @@ export default {
       })
     },
     getAuths() {
+      this.loading = true
       api.auths().then((res) => {
         this.auths = res.data
+        this.loading = false
       })
     },
     hasAuth(roleId, authId) {

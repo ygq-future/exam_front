@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div class="content" v-loading="loading">
     <div class="oper">
       <el-button type="primary" size="small" @click="addDialog = true">添加试卷</el-button>
       <el-input clearable v-model="query.keyword" style="width: 300px" @input="search">
@@ -100,6 +100,7 @@ export default {
   components: { PaperShow },
   data() {
     return {
+      loading: false,
       dialogVisible: false,
       query: {
         majorId: '',
@@ -169,6 +170,7 @@ export default {
       this.getPaperList()
     },
     getPaperList() {
+      this.loading = true
       if (this.isLoading) return
       this.isLoading = true
       api.paperList({ ...this.query, ...this.page }).then(res => {
@@ -177,6 +179,7 @@ export default {
         this.page.size = res.data.size
         this.page.total = res.data.total
         this.isLoading = false
+        this.loading = false
       })
     }
   }

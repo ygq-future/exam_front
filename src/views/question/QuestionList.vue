@@ -1,5 +1,5 @@
 <template>
-  <el-container class="question">
+  <el-container class="question" v-loading="loading">
     <el-header height="30">
       <div class="input-menu">
         <el-input placeholder="根据关键字查询题目" v-model="page.keyword" class="input-with-select" @input="search">
@@ -19,7 +19,7 @@
         </el-input>
       </div>
       <div class="menu">
-        <AddQuestion  @update="getDataList"/>
+        <AddQuestion @update="getDataList" />
         <!-- <el-button type="primary">添加题目</el-button> -->
       </div>
     </el-header>
@@ -34,6 +34,7 @@
             {{ getAnswer(scope.row) }}
           </template>
         </el-table-column>
+        <el-table-column prop="gmtModified" label="修改时间" align="center" />
         <el-table-column label="操作" align="center" width="250">
           <template slot-scope="scope">
             <!-- 通过题目类型决定打开哪一个表单 -->
@@ -44,7 +45,9 @@
               <GapFilling :id="scope.row.id" v-show="scope.row.typeId === 3" @update="getDataList" />
               <SingleChoice :id="scope.row.id" v-show="scope.row.typeId === 1" @update="getDataList" />
               <MultipleChoice :id="scope.row.id" v-show="scope.row.typeId === 2" @update="getDataList" />
-              <el-button size="small" type="danger" @click="del(scope.row.id)">删除题目</el-button>
+              <el-popconfirm cancel-button-type="info" title="确认删除此题目吗?" @confirm="del(scope.row.id)">
+                <el-button slot="reference" size="small" type="danger">删除题目</el-button>
+              </el-popconfirm>
             </div>
           </template>
         </el-table-column>
@@ -71,83 +74,91 @@
 </template>
 
 <script>
-import question from "@/api/question";
-import MultipleChoice from "./form/MultipleChoice.vue";
-import SingleChoice from "./form/SingleChoice.vue";
-import GapFilling from "./form/GapFilling.vue";
-import TrueOrFalse from "./form/TrueOrFalse.vue";
-import ShortAnswerQuestion from "./form/ShortAnswerQuestion.vue";
-import AddQuestion from "./form/CreateQuestion.vue";
+import question from '@/api/question'
+import MultipleChoice from './form/MultipleChoice.vue'
+import SingleChoice from './form/SingleChoice.vue'
+import GapFilling from './form/GapFilling.vue'
+import TrueOrFalse from './form/TrueOrFalse.vue'
+import ShortAnswerQuestion from './form/ShortAnswerQuestion.vue'
+import AddQuestion from './form/CreateQuestion.vue'
 export default {
   data: () => ({
+    loading: false,
     dataList: [],
     page: {
       current: 1,
       size: 10,
       typeId: null,
-      sortByDate: 1,
-      sortType: "desc",
-      keyword: "",
-      total: 0,
+      sortByDate: 0,
+      sortType: 'desc',
+      keyword: '',
+      total: 0
     },
     questionType: [],
-    timer: 0,
+    timer: 0
   }),
   methods: {
     //获取题目列表
     async getDataList() {
+      this.loading = true
       //数据校验,防止传递空值
-      const params = { ...this.page };
+      const params = { ...this.page }
       for (let item in params) {
-        if (params[item] === "" || params[item] === null || params[item] === undefined) delete params[item];
+        if (params[item] === '' || params[item] === null || params[item] === undefined) delete params[item]
       }
       //调用接口
-      const res = await question.getList({ ...params });
+      const res = await question.getList({ ...params })
+      this.loading = false
       //设置数据
-      this.dataList = res.data.rows;
-      this.page.total = res.data.total;
-      this.page.current = res.data.current;
+      this.dataList = res.data.rows
+      this.page.total = res.data.total
+      this.page.current = res.data.current
     },
     // 获取全部题目类型
     async getType() {
-      const res = await question.getType();
-      this.questionType = res.data;
+      const res = await question.getType()
+      this.questionType = res.data
     },
-    async del(id) {
-      await question.del(id);
-      this.getDataList();
+    del(id) {
+      question.del(id).then(res => {
+        this.getDataList()
+      })
     },
     async currentChange(current) {
-      this.page.current = current;
-      this.getDataList();
+      this.page.current = current
+      this.getDataList()
     },
     async search() {
-      clearTimeout(this.timer);
+      clearTimeout(this.timer)
       setTimeout(() => {
-        this.page.current = 1;
-        this.getDataList();
-      }, 300);
+        this.page.current = 1
+        this.getDataList()
+      }, 300)
     },
     async sizeChange(size) {
-      this.page.size = size;
-      await this.getDataList();
+      this.page.size = size
+      await this.getDataList()
     },
     getAnswer(row) {
       if (row.typeId === 4) {
-        return row.answer === 1 ? "正确" : "错误";
+        return row.answer === 1 ? '正确' : '错误'
       } else if (row.typeId === 1 || row.typeId === 2) {
-        return row.selects.filter(e=>e.id === parseInt(row.answer))[0].description
+        let arr = row.answer.split(',')
+        return row.selects
+          .filter(e => arr.includes(e.id + ''))
+          .map(e => e.itemId)
+          .join(',')
       }
-      return row.answer;
-    },
+      return row.answer
+    }
   },
   //页面初始化事件
   created() {
-    this.getType();
-    this.getDataList();
+    this.getType()
+    this.getDataList()
   },
-  components: { MultipleChoice, SingleChoice, GapFilling, TrueOrFalse, ShortAnswerQuestion, AddQuestion },
-};
+  components: { MultipleChoice, SingleChoice, GapFilling, TrueOrFalse, ShortAnswerQuestion, AddQuestion }
+}
 </script>
 <style scoped lang="scss">
 .buttons {
@@ -167,9 +178,9 @@ export default {
   }
 }
 .input-menu {
-  width: 70vmin;
+  width: 90vmin;
   .el-select {
-    width: 16vmin;
+    width: 18vmin;
   }
   .left {
     margin-left: 20px;

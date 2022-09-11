@@ -12,7 +12,7 @@
           <el-input type="textarea" placeholder="请输入题目描述" v-model="questionData.title" />
         </el-form-item>
 
-        <el-form-item v-for="(item, index) in questionData.selects" label-position="left">
+        <el-form-item v-for="(item, index) in questionData.selects" label-position="left" :key="index">
           <div class="form-wrap">
             <el-input
               v-model="item.description"
@@ -82,7 +82,6 @@ export default {
           return;
         }
         //表单通过验证后,直接触发提交事件
-        console.log(item);
         const data = {
           description:item.description
         }
@@ -90,7 +89,6 @@ export default {
       }
       //如果表单咩有时间属性,则走新加选项方法
       else {
-        // console.log(12);
         await question.addQuestion({ ...item });
       }
     },

@@ -25,7 +25,7 @@
         </el-form-item>
 
         <!-- 单选题表单 -->
-        <el-form-item v-show="params.typeId === 1" v-for="(item, index) in params.selectQuestions">
+        <el-form-item v-show="params.typeId === 1" v-for="(item, index) in params.selectQuestions" :key="index">
           <el-input v-model="item.description">
             <template slot="prepend">
               <el-radio v-model="params.answer" :label="createIndex(item, index)" />
@@ -45,7 +45,7 @@
           ></el-input>
         </el-form-item>
         <!-- 多选表单 -->
-        <el-form-item v-show="params.typeId === 2" v-for="(item, index) in params.selectQuestions">
+        <el-form-item v-show="params.typeId === 2" v-for="(item, index) in params.selectQuestions" :key="index">
           <el-input v-model="item.description">
             <template #prepend>
               <el-checkbox :label="createIndex(item, index)" v-model="checkData"></el-checkbox>
@@ -67,52 +67,52 @@
 </template>
 
 <script>
-import util from "./util";
-import Matrix from "./Matrix.vue";
-import question from "@/api/question";
+import util from './util'
+import Matrix from './Matrix.vue'
+import question from '@/api/question'
 export default {
   data: () => ({
     questionData: {
-      selects: [],
+      selects: []
     },
     checkData: [],
     params: {
       typeId: 1,
-      title: "",
-      score: "",
-      answer: "",
+      title: '',
+      score: '',
+      answer: '',
       selectQuestions: [
         {
-          description: "",
-        },
-      ],
+          description: ''
+        }
+      ]
     },
     questionType: [],
-    visible: false,
+    visible: false
   }),
   computed: {
     hideAddBtn() {
-      if (this.params.typeId === 1 || this.params.typeId === 2) return false;
-      return true;
+      if (this.params.typeId === 1 || this.params.typeId === 2) return false
+      return true
     },
     typeName() {
-      return this.questionType.filter((e) => e.id === this.params.typeId)[0].name;
-    },
+      return this.questionType.filter(e => e.id === this.params.typeId)[0].name
+    }
   },
 
   methods: {
     //初始化方法
     async init() {
-      this.visible = true;
+      this.visible = true
       //拿到处理后的数据
-      await this.getType();
+      await this.getType()
     },
     createIndex(index, row) {
-      return util.createIndex(index, row);
+      return util.createIndex(index, row)
     },
     //单纯将index转为字母并返回
     createIndex(item, index) {
-      return util.createIndex(index, item);
+      return util.createIndex(index, item)
     },
     async edit(item) {
       //以gmtCreate作为标识,判断表单是数据库取得的还是新加的
@@ -121,68 +121,67 @@ export default {
         //验证表单是否已经修改,如果没有修改,直接将状态改为编辑,之后直接返回
         if (item.tip === item.description) {
           this.$message({
-            message: "未做任何更改",
-          });
-          return;
+            message: '未做任何更改'
+          })
+          return
         }
         //表单通过验证后,直接触发提交事件
-        await question.editQuestion(item.id, { ...item });
+        await question.editQuestion(item.id, { ...item })
       }
       //如果表单咩有时间属性,则走新加选项方法
       else {
-        // console.log(12);
-        await question.addQuestion({ ...item });
+        await question.addQuestion({ ...item })
       }
     },
     close() {
-      this.visible = false;
+      this.visible = false
     },
 
     // 获取全部题目类型
     async getType() {
-      const res = await question.getType();
-      this.questionType = res.data;
+      const res = await question.getType()
+      this.questionType = res.data
     },
     delOpt(item) {
-      this.params.selectQuestions.splice(this.params.selectQuestions.indexOf(item), 1);
+      this.params.selectQuestions.splice(this.params.selectQuestions.indexOf(item), 1)
     },
     addOpt() {
       if (this.params.selectQuestions.length > 6) {
         this.$message({
-          message: "已经添加到最大选项了!不可再添加了",
-          type: "warning",
-        });
-        return;
+          message: '已经添加到最大选项了!不可再添加了',
+          type: 'warning'
+        })
+        return
       }
       this.params.selectQuestions.push({
-        description: "",
-      });
+        description: ''
+      })
     },
     async submit() {
       if (this.params.typeId === 2) {
-        this.params.answer = this.checkData.toString();
+        this.params.answer = this.checkData.toString()
       }
-      await question.add({ ...this.params, typeName: this.typeName });
+      await question.add({ ...this.params, typeName: this.typeName })
       const params = {
-        typeId : this .params.typeId,
-        title: "",
-        score: "",
-        answer: "",
+        typeId: this.params.typeId,
+        title: '',
+        score: '',
+        answer: '',
         selectQuestions: [
           {
-            description: "",
-          },
-        ],
-      };
-      this.params = {...params}
+            description: ''
+          }
+        ]
+      }
+      this.params = { ...params }
       this.$message({
-        message: "添加成功",
-      });
+        message: '添加成功'
+      })
       this.$emit('update')
-    },
+    }
   },
-  components: { Matrix },
-};
+  components: { Matrix }
+}
 </script>
 <style lang="scss" scoped>
 .form {

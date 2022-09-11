@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container class="my">
     <el-header class="header">
       <Header/>
     </el-header>
@@ -24,6 +24,10 @@ export default {
 </script>
 
 <style scoped>
+.my {
+  width: 100vw;
+}
+
 .header {
   width: 100%;
   height: 60px;

@@ -75,7 +75,6 @@ export default {
       }
       //如果表单咩有时间属性,则走新加选项方法
       else {
-        // console.log(12);
         await question.addQuestion({ ...item });
       }
     },

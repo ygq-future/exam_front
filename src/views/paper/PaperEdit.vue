@@ -197,7 +197,6 @@ $简答题$10
         questions = questions.concat(arr)
       }
       data.questions = questions
-      console.log(data)
 
       this.$confirm(`当前是${this.importMode}模式,确认导入吗?`, '提示', {
         confirmButtonText: '确认',

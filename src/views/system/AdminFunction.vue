@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div class="content" v-loading="loading">
     <el-card class="offline">
       <el-autocomplete
         v-model="selected"
@@ -51,6 +51,7 @@ import major from '@/api/major'
 export default {
   data() {
     return {
+      loading: false,
       selected: '',
       timer: 0,
       selectObj: null,
@@ -80,8 +81,10 @@ export default {
       })
     },
     getApplyList() {
+      this.loading = true
       api.applyList({ ...this.query }).then(res => {
         this.applyList = res.data
+        this.loading = false
       })
     },
     offline() {
@@ -131,7 +134,7 @@ export default {
   }
 }
 
-::v-deep .el-select {
+:deep(.el-select) {
   width: 120px;
 }
 

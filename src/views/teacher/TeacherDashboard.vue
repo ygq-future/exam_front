@@ -60,7 +60,7 @@
       </el-card>
     </div>
 
-    <el-dialog title="申请权限" center :visible.sync="applyDialog" width="300px">
+    <el-dialog :close-on-click-modal="false" title="申请权限" center :visible.sync="applyDialog" width="300px">
       <el-select v-model="selected" clearable>
         <el-option v-for="item in majorList" :key="item.id" :value="item.id" :label="item.name" />
       </el-select>
@@ -74,7 +74,7 @@
       <el-transfer
         @change="change"
         v-model="pushValue"
-        :data="byMeMajors"
+        :data="uniqueByMeMajors"
         :props="{
           key: 'majorId',
           label: 'majorName'
@@ -108,7 +108,9 @@ export default {
       pushValue: [],
       oldPushValue: [],
       isFirst: true,
-      loading: false
+      loading: false,
+      //对byMeMajors中majorId和majorName去重
+      uniqueByMeMajors: []
     }
   },
   mounted() {
@@ -121,7 +123,6 @@ export default {
       this.pushExamId = 0
     },
     openPush(id) {
-      this.loading = true
       this.pushExamId = id
       this.isFirst = true
       this.findPushedMajor(this.pushExamId)
@@ -166,6 +167,7 @@ export default {
         })
     },
     findPushedMajor(examId) {
+      this.loading = true
       paper.findPushed(examId).then(res => {
         this.pushValue = res.data
         this.pushDialog = true
@@ -191,11 +193,22 @@ export default {
     getByMeMajor() {
       teacher.byMe().then(res => {
         this.byMeMajors = res.data
+        let temp = []
+        this.byMeMajors.forEach(item => {
+          temp.push(JSON.stringify({ majorId: item.majorId, majorName: item.majorName }))
+        })
+        //去重
+        temp = Array.from(new Set(temp))
+        temp.forEach(item => {
+          this.uniqueByMeMajors.push(JSON.parse(item))
+        })
       })
     },
     getPapers() {
+      this.loading = true
       paper.paperList({ byMe: true, current: 1, size: 999 }).then(res => {
         this.papers = res.data.rows
+        this.loading = false
       })
     },
     delExam(id) {
