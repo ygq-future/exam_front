@@ -41,7 +41,6 @@ export default {
     })
   },
   changeQuestion(data) {
-    console.log(data)
     return http({
       url: `question/${data.id}`,
       method: 'put',
@@ -54,6 +53,19 @@ export default {
       method: 'post',
       url: '/question/batchImport',
       data
+    })
+  },
+  add(data){
+    return http({
+      url:'/question',
+      method:'post',
+      data
+    })
+  },
+  del(id){
+    return http({
+      url:`/question/${id}`,
+      method:'delete'
     })
   }
 }

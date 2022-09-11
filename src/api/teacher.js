@@ -1,9 +1,10 @@
 import http from '@/util/http'
 export default {
-  getList(data) {
+  getList(params) {
     return http({
       url: '/teacher',
-      data
+      method: 'get',
+      params
     })
   },
   lock(teacherId) {
