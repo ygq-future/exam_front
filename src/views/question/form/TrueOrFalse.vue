@@ -2,7 +2,7 @@
 <template>
   <div>
     <el-button @click="init">修改题目</el-button>
-    <Matrix :visible="visible" @close="close" @submit="submit" title="填空题" :topVisible="false">
+    <Matrix :visible="visible" @close="close" @submit="submit" title="判断题" :topVisible="false">
       <template #button>
         <el-input v-model="questionData.score" placeholder="题目分数"> </el-input>
       </template>
@@ -85,6 +85,8 @@ export default {
     async submit() {
       await question.changeQuestion({ ...this.questionData });
       await this.init();
+      this.close()
+      this.$emit('update')
     },
   },
   components: { Matrix },

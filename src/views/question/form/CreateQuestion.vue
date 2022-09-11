@@ -178,6 +178,7 @@ export default {
       this.$message({
         message: "添加成功",
       });
+      this.$emit('update')
     },
   },
   components: { Matrix },

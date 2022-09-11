@@ -92,6 +92,8 @@ export default {
     async submit() {
       await question.changeQuestion({ ...this.questionData });
       await this.init();
+      this.close()
+      this.$emit('update')
     },
   },
   components: { Matrix },

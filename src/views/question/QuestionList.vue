@@ -7,7 +7,7 @@
             <el-option label="全部" :value="null" />
             <el-option v-for="item in questionType" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
-          
+
           <el-select slot="append" v-model="page.sortByDate" placeholder="时间排序" @change="getDataList">
             <el-option label="日期排序" :value="1" />
             <el-option label="不按日期排序" :value="0" />
@@ -19,7 +19,7 @@
         </el-input>
       </div>
       <div class="menu">
-        <AddQuestion />
+        <AddQuestion  @update="getDataList"/>
         <!-- <el-button type="primary">添加题目</el-button> -->
       </div>
     </el-header>
@@ -31,7 +31,7 @@
         <el-table-column prop="title" label="题目标题"></el-table-column>
         <el-table-column label="答案">
           <template slot-scope="scope">
-            {{ scope.row.answer }}
+            {{ getAnswer(scope.row) }}
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center" width="250">
@@ -39,11 +39,11 @@
             <!-- 通过题目类型决定打开哪一个表单 -->
             <div class="buttons">
               <!-- 表单按钮 -->
-              <ShortAnswerQuestion :id="scope.row.id" v-show="scope.row.typeId === 5" />
-              <TrueOrFalse :id="scope.row.id" v-show="scope.row.typeId === 4" />
-              <GapFilling :id="scope.row.id" v-show="scope.row.typeId === 3" />
-              <SingleChoice :id="scope.row.id" v-show="scope.row.typeId === 1" />
-              <MultipleChoice :id="scope.row.id" v-show="scope.row.typeId === 2" />
+              <ShortAnswerQuestion :id="scope.row.id" v-show="scope.row.typeId === 5" @update="getDataList" />
+              <TrueOrFalse :id="scope.row.id" v-show="scope.row.typeId === 4" @update="getDataList" />
+              <GapFilling :id="scope.row.id" v-show="scope.row.typeId === 3" @update="getDataList" />
+              <SingleChoice :id="scope.row.id" v-show="scope.row.typeId === 1" @update="getDataList" />
+              <MultipleChoice :id="scope.row.id" v-show="scope.row.typeId === 2" @update="getDataList" />
               <el-button size="small" type="danger" @click="del(scope.row.id)">删除题目</el-button>
             </div>
           </template>
@@ -128,10 +128,18 @@ export default {
         this.getDataList();
       }, 300);
     },
-    async sizeChange(size){
-      this.page.size = size
-      await this.getDataList()
-    }
+    async sizeChange(size) {
+      this.page.size = size;
+      await this.getDataList();
+    },
+    getAnswer(row) {
+      if (row.typeId === 4) {
+        return row.answer === 1 ? "正确" : "错误";
+      } else if (row.typeId === 1 || row.typeId === 2) {
+        return row.selects.filter(e=>e.id === parseInt(row.answer))[0].description
+      }
+      return row.answer;
+    },
   },
   //页面初始化事件
   created() {
@@ -163,7 +171,7 @@ export default {
   .el-select {
     width: 16vmin;
   }
-  .left{
+  .left {
     margin-left: 20px;
     padding-right: 0px;
   }

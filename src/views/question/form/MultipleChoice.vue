@@ -129,6 +129,8 @@ export default {
     async submit() {
       await question.changeQuestion({...this.questionData})
       await this.init()
+      this.close()
+      this.$emit('update')
     },
     handleSelectionChange(val) {
       let ids = val.map((item) => item.id) || [];

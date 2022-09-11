@@ -21,7 +21,7 @@
               :placeholder="item.tip || '请输入选项描述'"
             >
               <template slot="prepend">
-                <el-radio :label="createIndex(item,index)" v-model="questionData.answer" />
+                <el-radio :label="item.id+''" v-model="questionData.answer" >{{createIndex(item,index)}}</el-radio>
               </template>
               <template #append>
                 <el-button>修改选项</el-button>
@@ -82,7 +82,11 @@ export default {
           return;
         }
         //表单通过验证后,直接触发提交事件
-        await question.editQuestion(item.id, { ...item });
+        console.log(item);
+        const data = {
+          description:item.description
+        }
+        await question.editQuestion(item.id, data);
       }
       //如果表单咩有时间属性,则走新加选项方法
       else {
@@ -113,13 +117,20 @@ export default {
       this.visible = false;
     },
     async submit() {
-      await question.changeQuestion({ ...this.questionData });
+      const params = {
+        id:this.questionData.id,
+        "title": this.questionData.title,
+        "typeId": this.questionData.typeId,
+        "typeName": this.questionData.typeName,
+        "score": this.questionData.score,
+        "answer": this.questionData.answer
+      }
+      await question.changeQuestion(params);
       await this.init();
+      this.close()
+      this.$emit('update')
     },
-    handleSelectionChange(val) {
-      let ids = val.map((item) => item.id) || [];
-      this.questionData.answer = ids.join(",");
-    },
+
     parsingAnswer() {
       return this.questionData.answer.split(",").map(Number);
     },
