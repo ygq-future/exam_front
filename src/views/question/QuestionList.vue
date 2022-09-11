@@ -18,9 +18,9 @@
           </el-select>
         </el-input>
       </div>
+
       <div class="menu">
         <AddQuestion @update="getDataList" />
-        <!-- <el-button type="primary">添加题目</el-button> -->
       </div>
     </el-header>
     <!-- 题目表格区域 -->
