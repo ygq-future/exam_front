@@ -242,7 +242,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep .el-dialog__body {
+:deep(.el-dialog__body) {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -268,7 +268,7 @@ export default {
     flex-wrap: wrap;
     flex-direction: row;
 
-    ::v-deep .el-tag {
+    :deep(.el-tag) {
       width: fit-content;
       margin-right: 10px;
     }
@@ -302,7 +302,7 @@ export default {
   margin-right: 15px;
 }
 
-::v-deep .el-descriptions-item__label {
+:deep(.el-descriptions-item__label) {
   display: flex;
   align-items: center;
 }
