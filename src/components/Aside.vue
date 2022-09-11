@@ -11,14 +11,24 @@
       <i class="el-icon-set-up"></i>
     </div>
 
-    <el-submenu index="teacher">
+    <el-menu-item index="/teacher-dashboard">
+      <i class="el-icon-s-operation"></i>
+      <span slot="title">仪表盘</span>
+    </el-menu-item>
+
+    <el-menu-item index="/teacher-list">
+      <i class="el-icon-user"></i>
+      <span slot="title">教师管理</span>
+    </el-menu-item>
+
+    <!-- <el-submenu index="teacher">
       <template slot="title">
         <i class="el-icon-user"></i>
         <span>教师管理</span>
       </template>
       <el-menu-item index="/teacher-list">教师列表</el-menu-item>
-      <el-menu-item index="/teacher-authority">教师授权</el-menu-item>
-    </el-submenu>
+      <el-menu-item index="/teacher-dashboard">教师仪表盘</el-menu-item>
+    </el-submenu> -->
 
     <el-menu-item index="/major-list">
       <i class="el-icon-date"></i>

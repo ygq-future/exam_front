@@ -11,19 +11,19 @@
       <el-button type="danger" size="small" @click="offline">下线</el-button>
     </el-card>
 
-    <el-card class="message">
-      <el-empty
-        v-if="applyList.length === 0"
-        description="还没有消息"
-      ></el-empty>
-      <el-table :data="applyList" style="width: 100%" height="500">
-        <el-table-column
-          fixed
-          align="center"
-          type="index"
-          width="100"
-          label="编号"
-        />
+    <el-card>
+      <el-input clearable @input="getApplyList" class="input-with-select" placeholder="名称搜索" v-model="query.keyword">
+        <template slot="prepend">
+          <el-select @change="getApplyList" v-model="query.majorId">
+            <el-option v-for="item in majorList" :key="item.id" :value="item.id" :label="item.name" />
+          </el-select>
+        </template>
+      </el-input>
+
+      <el-empty v-if="applyList.length === 0" description="还没有消息"></el-empty>
+
+      <el-table v-else :data="applyList" style="width: 100%" height="400">
+        <el-table-column fixed align="center" type="index" width="100" label="编号" />
         <el-table-column align="center" prop="teacherName" label="教师名称" />
         <el-table-column align="center" prop="majorName" label="专业名称" />
         <el-table-column align="center" prop="enable" label="状态">
@@ -34,12 +34,9 @@
         </el-table-column>
         <el-table-column align="center" fixed="right" width="100" label="操作">
           <template slot-scope="scope">
-            <el-button
-              size="small"
-              :type="scope.row.enable ? 'danger' : 'success'"
-              @click="reverseStatus(scope.row)"
-              >{{ scope.row.enable ? '禁用' : '启用' }}</el-button
-            >
+            <el-button size="small" :type="scope.row.enable ? 'danger' : 'success'" @click="reverseStatus(scope.row)">{{
+              scope.row.enable ? '禁用' : '启用'
+            }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -49,6 +46,7 @@
 
 <script>
 import api from '@/api/admin'
+import major from '@/api/major'
 
 export default {
   data() {
@@ -57,26 +55,38 @@ export default {
       timer: 0,
       selectObj: null,
       applyList: [],
+      majorList: [],
+      query: {
+        keyword: '',
+        majorId: 0
+      }
     }
   },
   mounted() {
     this.getApplyList()
+    this.getMajorList()
   },
   methods: {
     reverseStatus(item) {
-      api.reverseStatus(item.id).then((res) => {
+      api.reverseStatus(item.id).then(res => {
         this.$message.success(res.message)
         this.getApplyList()
       })
     },
+    getMajorList() {
+      major.majorList().then(res => {
+        this.majorList = res.data
+        this.majorList.unshift({ id: 0, name: '全部' })
+      })
+    },
     getApplyList() {
-      api.applyList().then((res) => {
+      api.applyList({ ...this.query }).then(res => {
         this.applyList = res.data
       })
     },
     offline() {
       if (this.selectObj) {
-        api.offline(this.selectObj.unique).then((res) => {
+        api.offline(this.selectObj.unique).then(res => {
           this.$message.success(res.message)
           this.selected = ''
         })
@@ -88,31 +98,27 @@ export default {
     querySearch(queryString, cb) {
       clearTimeout(this.timer)
       this.timer = setTimeout(() => {
-        api.accounts().then((res) => {
+        api.accounts().then(res => {
           let data = res.data
-          data.forEach((user) => {
+          data.forEach(user => {
             user.value = user.studentNo ? user.studentNo : user.teacherNo
             user.unique = user.value
             user.value = `${user.name}#${user.value}`
           })
           const result =
-            data.filter((item) => {
+            data.filter(item => {
               return item.value.indexOf(queryString) >= 0
             }) || []
           cb(result)
         })
         // 调用 callback 返回建议列表的数据
       }, 400)
-    },
-  },
+    }
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-.message {
-  height: 500px;
-}
-
 .offline {
   width: 300px;
   margin-bottom: 15px;
@@ -123,5 +129,14 @@ export default {
   .el-autocomplete {
     width: 100%;
   }
+}
+
+::v-deep .el-select {
+  width: 120px;
+}
+
+.input-with-select {
+  width: 400px;
+  margin-bottom: 15px;
 }
 </style>

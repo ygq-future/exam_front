@@ -45,10 +45,11 @@ export default {
       url: '/admin/offline/' + login
     })
   },
-  applyList() {
+  applyList(params) {
     return http({
       method: "get",
-      url: "/teacher-major"
+      url: "/teacher-major",
+      params
     })
   },
   reverseStatus(id) {

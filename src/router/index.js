@@ -29,9 +29,9 @@ const routes = [
         component: () => import('@/views/teacher/TeacherList.vue')
       },
       {
-        path: '/teacher-authority',
-        name: 'teacherAuthority',
-        component: () => import('@/views/teacher/TeacherAuthority.vue')
+        path: '/teacher-dashboard',
+        name: 'teacherDashboard',
+        component: () => import('@/views/teacher/TeacherDashboard.vue')
       },
       //专业管理
       {

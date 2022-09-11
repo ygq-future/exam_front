@@ -56,9 +56,8 @@ service.interceptors.response.use(res => {
     timer = setTimeout(() => {
       Message({
         type: 'warning',
-        message: '没有权限!'
+        message: data.message
       })
-      router.back()
       timer = 0
     }, 500)
     return Promise.reject(data)

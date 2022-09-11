@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <div class="left">
-      <el-button icon="el-icon-back" class="back" type="info" @click="$router.push('/paper-list')">返回</el-button>
+      <el-button icon="el-icon-back" class="back" type="info" @click="$router.back()">返回</el-button>
 
       <el-card class="info">
         <el-alert title="修改试卷信息" type="info" show-icon center :closable="false" />
@@ -197,6 +197,7 @@ $简答题$10
         questions = questions.concat(arr)
       }
       data.questions = questions
+      console.log(data)
 
       this.$confirm(`当前是${this.importMode}模式,确认导入吗?`, '提示', {
         confirmButtonText: '确认',
@@ -255,6 +256,12 @@ $简答题$10
         let preciseWord = match[1]
         types.push(preciseWord)
         str = str.substring(match.index + fullWord.length)
+      }
+
+      //防止用户重复写了某一个类型的题目标题
+      let uniqueTypes = Array.from(new Set(types))
+      if (uniqueTypes.length !== types.length) {
+        return this.setIllegal('请查看是否有重复的题目类型声明!')
       }
 
       //根据题型字符串进行正则匹配分隔,过滤前后空字符
@@ -335,6 +342,9 @@ $简答题$10
               //用来判断此选择题下是否有重复选项
               let itemIdArr = []
               selects = selects.map(select => {
+                if (this.containsIllegalChar(select)) {
+                  return this.setIllegal('选项包含了非法字符!')
+                }
                 let itemId = select[0]
                 itemIdArr.push(itemId)
                 let description = select.substring(select.indexOf(itemId) + 1).trim()
@@ -365,6 +375,10 @@ $简答题$10
               //根据itemId查找对应的虚拟id,方便渲染到页面上,请求后端时需要重新转化为itemId
               let ids = []
               answerArr.forEach(item => {
+                //非法处理
+                if (this.containsIllegalChar(item)) {
+                  return this.setIllegal('答案包含了非法字符!')
+                }
                 selects.forEach(select => {
                   if (item.toUpperCase() == select.itemId.toUpperCase()) {
                     ids.push(select.id)
@@ -393,7 +407,28 @@ $简答题$10
             }
           })
           //添加到数组中
-          arr.push({ title, answer, typeId, typeName: type, selects, score })
+          let obj = { title, answer, typeId, typeName: type, selects, score }
+
+          //最后结果的校验
+          if (obj.title.trim() === '') {
+            return this.setIllegal('标题不能为空!')
+          }
+
+          if (this.containsIllegalChar(obj.title)) {
+            return this.setIllegal('标题包含了非法字符!')
+          }
+
+          if (this.containsIllegalChar(obj.answer)) {
+            return this.setIllegal('答案包含了非法字符!')
+          }
+
+          obj.selects.forEach(e => {
+            if (e.itemId.trim() === '' || e.description.trim() === '') {
+              return this.setIllegal('选项标题或描述不能为空!')
+            }
+          })
+
+          arr.push(obj)
         })
       }
 
@@ -401,6 +436,9 @@ $简答题$10
       if (!this.illegal.value) {
         this.parseQues = tempObj
       }
+    },
+    containsIllegalChar(str) {
+      return str.indexOf('$') >= 0 || str.indexOf('<>') >= 0 || str.indexOf('@') >= 0 || str.indexOf('#') >= 0
     },
     setIllegal(msg) {
       this.illegal.value = true

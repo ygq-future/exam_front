@@ -119,7 +119,7 @@ export default {
       form: {
         name: '',
         subjectName: '',
-        duration: 0
+        duration: ''
       },
       majorList: [],
       isLoading: false,

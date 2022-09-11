@@ -66,6 +66,7 @@ export default {
     refreshAuth() {
       api.refreshAuth().then((res) => {
         this.$message.success(res.message)
+        this.getAuths()
       })
     },
     getRoles() {

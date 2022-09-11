@@ -47,5 +47,25 @@ export default {
       url: '/exam-question',
       data
     })
+  },
+  findPushed(examId) {
+    return http({
+      method: 'get',
+      url: '/major-exam/pushed/' + examId
+    })
+  },
+  push(data) {
+    return http({
+      method: 'post',
+      url: '/major-exam',
+      data
+    })
+  },
+  cancelPush(data) {
+    return http({
+      method: 'delete',
+      url: '/major-exam',
+      data
+    })
   }
 }
