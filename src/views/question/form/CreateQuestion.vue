@@ -16,7 +16,7 @@
         <el-select placeholder="请选择题形" v-model="params.typeId">
           <el-option v-for="item in questionType" :key="item.id" :label="item.name" :value="item.id"> </el-option>
         </el-select>
-        <el-input v-model="params.score" type="number"></el-input>
+        <el-input v-model="params.score" type="number" placeholder="分数"></el-input>
       </template>
 
       <el-form>
@@ -57,8 +57,8 @@
         </el-form-item>
         <el-form-item v-show="params.typeId === 4">
           <el-radio-group v-model="params.answer" class="form">
-            <el-radio-button  border  label="0">错误</el-radio-button>
-            <el-radio-button  border  label="1">正确</el-radio-button>
+            <el-radio-button border label="0">错误</el-radio-button>
+            <el-radio-button border label="1">正确</el-radio-button>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -79,15 +79,9 @@ export default {
     params: {
       typeId: 1,
       title: "",
-      score: 0,
+      score: "",
       answer: "",
       selectQuestions: [
-        {
-          description: "",
-        },
-        {
-          description: "",
-        },
         {
           description: "",
         },
@@ -168,8 +162,19 @@ export default {
       if (this.params.typeId === 2) {
         this.params.answer = this.checkData.toString();
       }
-      console.log(this.params);
       await question.add({ ...this.params, typeName: this.typeName });
+      const params = {
+        typeId : this .params.typeId,
+        title: "",
+        score: "",
+        answer: "",
+        selectQuestions: [
+          {
+            description: "",
+          },
+        ],
+      };
+      this.params = {...params}
       this.$message({
         message: "添加成功",
       });
@@ -179,8 +184,8 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-  .form{
-    display: flex;
-    justify-content: center;
-  }
+.form {
+  display: flex;
+  justify-content: center;
+}
 </style>

@@ -7,13 +7,14 @@
             <el-option label="全部" :value="null" />
             <el-option v-for="item in questionType" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
-          <el-select slot="prepend" v-model="page.sortType" placeholder="排序方式" @change="getDataList">
+          
+          <el-select slot="append" v-model="page.sortByDate" placeholder="时间排序" @change="getDataList">
+            <el-option label="日期排序" :value="1" />
+            <el-option label="不按日期排序" :value="0" />
+          </el-select>
+          <el-select slot="append" v-model="page.sortType" placeholder="排序方式" @change="getDataList" class="left">
             <el-option label="升序" value="asc" />
             <el-option label="降序" value="desc" />
-          </el-select>
-          <el-select slot="append" v-model="page.sortByDate" placeholder="时间排序" @change="getDataList">
-            <el-option label="日期排序" :value="0" />
-            <el-option label="不按日期排序" :value="1" />
           </el-select>
         </el-input>
       </div>
@@ -24,7 +25,7 @@
     </el-header>
     <!-- 题目表格区域 -->
     <el-main>
-      <el-table :data="dataList" height="70vh">
+      <el-table :data="dataList" height="530px">
         <el-table-column prop="id" label="ID" width="50" align="center"></el-table-column>
         <el-table-column prop="typeName" label="题目类型" width="100" align="center"></el-table-column>
         <el-table-column prop="title" label="题目标题"></el-table-column>
@@ -58,6 +59,8 @@
           :total="page.total"
           :current-page="page.current"
           :page-size="page.size"
+          :page-sizes="[10, 20, 30, 40]"
+          @size-change="sizeChange"
           @current-change="currentChange"
         >
           <!-- @current-change="getData" @size-change="getData" -->
@@ -125,6 +128,10 @@ export default {
         this.getDataList();
       }, 300);
     },
+    async sizeChange(size){
+      this.page.size = size
+      await this.getDataList()
+    }
   },
   //页面初始化事件
   created() {
@@ -154,7 +161,11 @@ export default {
 .input-menu {
   width: 70vmin;
   .el-select {
-    width: 15vmin;
+    width: 16vmin;
+  }
+  .left{
+    margin-left: 20px;
+    padding-right: 0px;
   }
 }
 </style>

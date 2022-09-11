@@ -1,6 +1,7 @@
 import http from '@/util/http'
 export default {
   getList(params) {
+    console.log("params",params);
     return http({
       url: '/teacher',
       method: 'get',
