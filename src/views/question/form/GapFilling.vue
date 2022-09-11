@@ -3,7 +3,7 @@
   <div>
     <el-button @click="init">修改题目</el-button>
     <Matrix :visible="visible" @close="close" @submit="submit" @addLine="addLine" title="填空题" :topVisible="false">
-      <template #button>
+      <template #buttons>
         <el-input v-model="questionData.score" placeholder="题目分数"> </el-input>
       </template>
       <template #header>

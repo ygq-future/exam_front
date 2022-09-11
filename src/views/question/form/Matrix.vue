@@ -20,16 +20,17 @@
     <el-container>
       <el-header height="30">
         <div class="el-header-menus">
-          <h1>{{ title || '编辑题目' }}</h1>
+          <h1>{{ title || "编辑题目" }}</h1>
           <!-- 默认操作列表,触发父元素的添加表单方法 -->
 
           <div class="optionsMenu">
             <slot name="options"></slot>
-
-            <el-button type="primary" round size="small" @click="addLine" v-show="!hideAddButton">
-              添加选项
-              <i class="el-icon-plus el-icon--right"></i>
-            </el-button>
+            <slot name="buttons">
+              <el-button type="primary" round size="small" @click="addLine" v-show="!hideAddButton">
+                添加选项
+                <i class="el-icon-plus el-icon--right"></i>
+              </el-button>
+            </slot>
           </div>
         </div>
         <slot name="header"></slot>
@@ -42,7 +43,7 @@
     </el-container>
     <template #footer class="dialog-footer">
       <el-button round @click="handleClose">取消</el-button>
-      <el-button round type="primary" @click="commitChange">{{ submitText || '确认修改' }}</el-button>
+      <el-button round type="primary" @click="commitChange">{{ submitText || "确认修改" }}</el-button>
     </template>
   </el-dialog>
 </template>
@@ -51,24 +52,24 @@
 export default {
   inheritAttrs: false,
   data: () => ({
-    fullscreen: false
+    fullscreen: false,
   }),
-  props: ['title', 'visible', 'topVisible', 'hideAddButton', 'submitText'],
+  props: ["title", "visible", "topVisible", "hideAddButton", "submitText"],
   methods: {
     handleClose() {
-      this.$emit('close')
+      this.$emit("close");
     },
     commitChange() {
-      this.$emit('submit')
+      this.$emit("submit");
     },
     switchFull() {
-      this.fullscreen = !this.fullscreen
+      this.fullscreen = !this.fullscreen;
     },
     addLine() {
-      this.$emit('addLine')
-    }
-  }
-}
+      this.$emit("addLine");
+    },
+  },
+};
 </script>
 <style lang="scss">
 .matrix {
