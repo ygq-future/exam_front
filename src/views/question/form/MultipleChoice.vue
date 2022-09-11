@@ -8,7 +8,6 @@
       </template>
       <template #options>
         <el-input v-model="questionData.score" placeholder="题目分数"> </el-input>
-        <el-button @click="toggleSelection()">TEST</el-button>
       </template>
       <el-table
         :row-class-name="lightLine"
