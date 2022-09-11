@@ -22,6 +22,6 @@ export default {
     row.itemId = String.fromCharCode(index + 65);
     return row.itemId;
   },
-
+  
   
 };

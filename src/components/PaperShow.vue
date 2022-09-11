@@ -2,7 +2,7 @@
   <div class="box" :style="{ height: height ? height : '450px' }">
     <el-empty description="题目为空,快去添加题目吧" v-if="Object.keys(questions).length === 0"></el-empty>
 
-    <div class="type" v-for="type in types" :key="type.id" v-if="questions[type.name]">
+    <div class="type" v-for="type in types" :key="type.id" v-show="questions[type.name]">
       <div class="title">{{ type.name }}</div>
       <el-divider></el-divider>
 
@@ -10,7 +10,11 @@
         <div class="item" v-for="(item, idx) in questions[type.name]" :key="item.id">
           <!-- question title -->
           <div style="margin-bottom: 10px">
-            {{ `${idx + 1}、 ${item.title}` }}
+            <span>{{ `${idx + 1}、 ${item.title}` }}</span>
+            <span style="padding: 0 10px; color: gray; font-size: 14px">({{ item.score }}分)</span>
+            <el-popconfirm title="确定删除此题目的关联吗?" @confirm="cancelQues(item.id)" cancel-button-type="info">
+              <i slot="reference" v-if="enableExam" class="el-icon-delete delete"></i>
+            </el-popconfirm>
           </div>
 
           <!-- singleton select -->
@@ -53,9 +57,17 @@
 
 <script>
 import api from '@/api/question'
+import paper from '@/api/paper'
 
 export default {
-  props: ['questions', 'height'],
+  props: {
+    questions: Object,
+    height: String,
+    enableExam: {
+      type: Boolean,
+      defualt: false
+    }
+  },
   data() {
     return {
       items: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
@@ -66,17 +78,29 @@ export default {
     this.getTypes()
   },
   methods: {
+    cancelQues(questionId) {
+      let params = { questionId, examId: this.$parent.id }
+      paper.cancelQues(params).then(res => {
+        this.$message.success(res.message)
+        this.$parent.getById()
+      })
+    },
     getTypes() {
       api.getType().then(res => {
         this.types = res.data
       })
-      0
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.delete {
+  margin-left: 15px;
+  color: red;
+  cursor: pointer;
+}
+
 .list {
   padding: 0 20px;
 

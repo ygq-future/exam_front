@@ -3,6 +3,7 @@ export default{
     getList(data){
         return http({
             url:'/teacher',
+            method:'get',
             data
         })
     },

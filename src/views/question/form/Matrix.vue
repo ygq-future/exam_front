@@ -22,13 +22,14 @@
         <div class="el-header-menus">
           <h1>{{ title || "编辑题目" }}</h1>
           <!-- 默认操作列表,触发父元素的添加表单方法 -->
-          
+
           <div class="optionsMenu">
             <slot name="options"></slot>
-            <el-button type="primary" round size="small" @click="addLine">
-            添加选项
-            <i class="el-icon-plus el-icon--right"></i>
-          </el-button>
+
+            <el-button type="primary" round size="small" @click="addLine" v-show="!hideAddButton">
+              添加选项
+              <i class="el-icon-plus el-icon--right"></i>
+            </el-button>
           </div>
         </div>
         <slot name="header"></slot>
@@ -40,8 +41,8 @@
       </el-main>
     </el-container>
     <template #footer class="dialog-footer">
-      <el-button round @click="handleClose">取消修改</el-button>
-      <el-button round type="primary" @click="commitChange">确认修改</el-button>
+      <el-button round @click="handleClose">取消</el-button>
+      <el-button round type="primary" @click="commitChange">{{ submitText || "确认修改" }}</el-button>
     </template>
   </el-dialog>
 </template>
@@ -52,7 +53,7 @@ export default {
   data: () => ({
     fullscreen: false,
   }),
-  props: ["title", "visible"],
+  props: ["title", "visible", "topVisible", "hideAddButton", "submitText"],
   methods: {
     handleClose() {
       this.$emit("close");
@@ -73,7 +74,7 @@ export default {
 .matrix {
   overflow: hidden;
   .el-dialog {
-    max-width: 80vw;
+    max-width: 60vw;
     top: 5%;
     max-height: 90vh;
     transition: all 0.7s ease-in-out;
@@ -110,7 +111,7 @@ export default {
           font-size: 1.5em;
         }
       }
-      .optionsMenu{
+      .optionsMenu {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -125,6 +126,13 @@ export default {
       font-weight: 800;
       text-align: center;
     }
+  }
+}
+.optionsMenu {
+  .el-input__inner {
+    width: 100%;
+    min-width: 150px;
+    max-width: 200px;
   }
 }
 </style>

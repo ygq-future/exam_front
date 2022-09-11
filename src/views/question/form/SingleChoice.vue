@@ -7,20 +7,27 @@
         <el-input v-model="questionData.score" placeholder="题目分数"> </el-input>
       </template>
 
-      <el-form
-        ref="form"
-        label-width="80px"
-        :model="questionData"
-        label-position="top"
-        class="form"
-      >
-        <el-form-item prop="title" label="题目">
+      <el-form ref="form" label-width="80px" :model="questionData" label-position="top" class="form">
+        <el-form-item prop="title">
           <el-input type="textarea" placeholder="请输入题目描述" v-model="questionData.title" />
         </el-form-item>
+
         <el-form-item v-for="(item, index) in questionData.selects" label-position="left">
-          <div class="formWrap">
-            <el-radio></el-radio>
-          <el-input></el-input>
+          <div class="form-wrap">
+            <el-input
+              v-model="item.description"
+              @change="edit(item)"
+              @focus="temporarySave(item)"
+              :placeholder="item.tip || '请输入选项描述'"
+            >
+              <template slot="prepend">
+                <el-radio :label="createIndex(item,index)" v-model="questionData.answer" />
+              </template>
+              <template #append>
+                <el-button>修改选项</el-button>
+                <el-button @click="del(item.id)">删除选项</el-button>
+              </template>
+            </el-input>
           </div>
         </el-form-item>
       </el-form>
@@ -56,32 +63,31 @@ export default {
       util.queryById(this.id);
       await this.init();
     },
-    async edit(row) {
-      if (!row.edit) {
-        row.edit = true;
-        // 临时记忆修改前的内容
-        row.tip = row.description;
-      } else {
-        //以gmtCreate作为标识,判断表单是数据库取得的还是新加的
-        //如果属性已经存在,则调用修改表单的方法
-        if (row.gmtCreate) {
-          //验证表单是否已经修改,如果没有修改,直接将状态改为编辑,之后直接返回
-          if (row.tip === row.description) {
-            this.$message({
-              message: "未做任何更改",
-            });
-            row.edit = false;
-            return;
-          }
-          //表单通过验证后,直接触发提交事件
-          await question.editQuestion(row.id, { ...row });
+    //单纯将index转为字母并返回
+    createIndex(item,index) {
+      return (util.createIndex(index,item));
+    },
+    temporarySave(item) {
+      item.tip = item.description;
+    },
+    async edit(item) {
+      //以gmtCreate作为标识,判断表单是数据库取得的还是新加的
+      //如果属性已经存在,则调用修改表单的方法
+      if (item.gmtCreate) {
+        //验证表单是否已经修改,如果没有修改,直接将状态改为编辑,之后直接返回
+        if (item.tip === item.description) {
+          this.$message({
+            message: "未做任何更改",
+          });
+          return;
         }
-        //如果表单咩有时间属性,则走新加选项方法
-        else {
-          await question.addQuestion({ ...row });
-        }
-        //修改编辑状态
-        row.edit = false;
+        //表单通过验证后,直接触发提交事件
+        await question.editQuestion(item.id, { ...item });
+      }
+      //如果表单咩有时间属性,则走新加选项方法
+      else {
+        // console.log(12);
+        await question.addQuestion({ ...item });
       }
     },
     //表单新加行方法
@@ -100,6 +106,7 @@ export default {
         edit: true,
         // itemId:
       };
+
       this.questionData.selects.push(params);
     },
     close() {
@@ -112,13 +119,6 @@ export default {
     handleSelectionChange(val) {
       let ids = val.map((item) => item.id) || [];
       this.questionData.answer = ids.join(",");
-    },
-    lightLine({ row, rowIndex }) {
-      const answer = this.parsingAnswer();
-      if (answer.some((e) => e === row.id)) {
-        return "warning-row";
-      }
-      return "";
     },
     parsingAnswer() {
       return this.questionData.answer.split(",").map(Number);
@@ -141,8 +141,12 @@ export default {
   background: oldlace;
 }
 </style>
-<style scoped>
+<style scoped lang="scss">
 .form {
   text-align: left;
+}
+.form-wrap {
+  display: flex;
+  align-items: center;
 }
 </style>

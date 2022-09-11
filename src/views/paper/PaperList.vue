@@ -25,6 +25,7 @@
         <el-table-column align="center" prop="name" label="试卷名称" />
         <el-table-column align="center" prop="subjectName" label="专业名称" />
         <el-table-column align="center" prop="operatorName" label="操作人" />
+        <el-table-column align="center" prop="totalScore" label="总分" />
         <el-table-column align="center" prop="duration" label="考试时间(分钟)" />
         <el-table-column align="center" fixed="right" width="300" label="操作">
           <template slot-scope="scope">
@@ -135,7 +136,7 @@ export default {
       setTimeout(() => {
         this.page.current = 1
         this.getPaperList()
-      }, 300);
+      }, 300)
     },
     delExam(id) {
       api.delExam(id).then(res => {
