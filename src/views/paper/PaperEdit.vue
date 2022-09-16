@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div class="content" v-loading="loading">
     <div class="left">
       <el-button icon="el-icon-back" class="back" type="info" @click="$router.back()">返回</el-button>
 
@@ -96,6 +96,7 @@ export default {
   components: { PaperShow },
   data() {
     return {
+      loading: false,
       dialogVisible: false,
       //试卷id
       id: 0,
@@ -481,10 +482,12 @@ $简答题$10
       })
     },
     getById() {
+      this.loading = true
       api.getById(this.id).then(res => {
         this.paper = res.data
         let { name, subjectName, duration } = this.paper
         this.form = { name, subjectName, duration }
+        this.loading = false
       })
       question.getType().then(res => {
         this.quesTypes = res.data

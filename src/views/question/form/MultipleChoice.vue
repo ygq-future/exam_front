@@ -39,7 +39,7 @@
         <el-table-column label="操作" align="center" width="150">
           <template slot-scope="scope">
             <el-button type="text" icon="el-icon-edit" @click="edit(scope.row)">
-              {{ scope.row.edit ? "保存" : "编辑" }}
+              {{ scope.row.edit ? '保存' : '编辑' }}
             </el-button>
             <el-button type="text" icon="el-icon-delete" @click="del(scope.row.id)">删除</el-button>
           </template>
@@ -50,41 +50,42 @@
 </template>
 
 <script>
-import util from "./util.js";
-import Matrix from "./Matrix.vue";
-import question from "@/api/question";
+import util from './util.js'
+import Matrix from './Matrix.vue'
+import question from '@/api/question'
+import { Loading } from 'element-ui'
 export default {
-  props: ["id"],
+  props: ['id'],
   data: () => ({
     questionData: {},
     dataList: [],
-    visible: false,
+    visible: false
   }),
   methods: {
     //初始化方法
     async init() {
-      this.visible = true;
+      this.visible = true
       //拿到处理后的数据
-      const res = await util.queryById(this.id);
-      this.questionData = res;
-      this.dataList = res.selects;
+      const res = await util.queryById(this.id)
+      this.questionData = res
+      this.dataList = res.selects
       this.$nextTick(() => {
-        this.toggleSelection();
-      });
+        this.toggleSelection()
+      })
     },
     createIndex(index, row) {
-      return util.createIndex(index, row);
+      return util.createIndex(index, row)
     },
     async del(id) {
-      await question.delQuestion(id);
-      util.queryById(this.id);
-      await this.init();
+      await question.delQuestion(id)
+      util.queryById(this.id)
+      await this.init()
     },
     async edit(row) {
       if (!row.edit) {
-        row.edit = true;
+        row.edit = true
         // 临时记忆修改前的内容
-        row.tip = row.description;
+        row.tip = row.description
       } else {
         //以gmtCreate作为标识,判断表单是数据库取得的还是新加的
         //如果属性已经存在,则调用修改表单的方法
@@ -92,20 +93,20 @@ export default {
           //验证表单是否已经修改,如果没有修改,直接将状态改为编辑,之后直接返回
           if (row.tip === row.description) {
             this.$message({
-              message: "未做任何更改",
-            });
-            row.edit = false;
-            return;
+              message: '未做任何更改'
+            })
+            row.edit = false
+            return
           }
           //表单通过验证后,直接触发提交事件
-          await question.editQuestion(row.id, { ...row });
+          await question.editQuestion(row.id, { ...row })
         }
         //如果表单咩有时间属性,则走新加选项方法
         else {
-          await question.addQuestion({ ...row });
+          await question.addQuestion({ ...row })
         }
         //修改编辑状态
-        row.edit = false;
+        row.edit = false
       }
     },
 
@@ -113,51 +114,54 @@ export default {
     addLine() {
       if (this.dataList.length > 6) {
         this.$message({
-          message: "已经添加到最大选项了!不可再添加了",
-          type: "warning",
-        });
-        return;
+          message: '已经添加到最大选项了!不可再添加了',
+          type: 'warning'
+        })
+        return
       }
       const params = {
-        description: "",
+        description: '',
         questionId: this.questionData.id,
         Answer: false,
-        edit: true,
+        edit: true
         // itemId:
-      };
-      this.questionData.selects.push(params);
+      }
+      this.questionData.selects.push(params)
     },
     close() {
-      this.visible = false;
+      this.visible = false
     },
     async submit() {
-      await question.changeQuestion({ ...this.questionData });
-      await this.init();
-      this.close();
-      this.$emit("update");
+      let loadingInstance = Loading.service({ fullscreen: true })
+      await question.changeQuestion({ ...this.questionData })
+      loadingInstance.close()
+      this.$message.success('修改成功')
+      await this.init()
+      this.close()
+      this.$emit('update')
     },
     handleSelectionChange(val) {
-      let ids = val.map((item) => item.id) || [];
-      this.questionData.answer = ids.join(",");
+      let ids = val.map(item => item.id) || []
+      this.questionData.answer = ids.join(',')
     },
     lightLine({ row }) {
-      const answer = this.parsingAnswer();
-      if (answer.some((e) => e === row.id)) {
-        return "warning-row";
+      const answer = this.parsingAnswer()
+      if (answer.some(e => e === row.id)) {
+        return 'warning-row'
       }
-      return "";
+      return ''
     },
     //获取答案数组
     parsingAnswer() {
-      return this.questionData.answer.split(",").map(Number);
+      return this.questionData.answer.split(',').map(Number)
     },
     toggleSelection() {
-      const answer = this.parsingAnswer();
-      this.dataList.forEach((e) => {
-        if (answer.some((n) => e.id === n)) {
-          this.$refs.multipleTable.toggleRowSelection(e);
+      const answer = this.parsingAnswer()
+      this.dataList.forEach(e => {
+        if (answer.some(n => e.id === n)) {
+          this.$refs.multipleTable.toggleRowSelection(e)
         }
-      });
+      })
     },
     select(all) {
       const ids = []
@@ -165,10 +169,10 @@ export default {
         ids.push(e.id)
       })
       this.questionData.answer = ids.toString()
-    },
+    }
   },
-  components: { Matrix },
-};
+  components: { Matrix }
+}
 </script>
 <style>
 .el-table .warning-row {

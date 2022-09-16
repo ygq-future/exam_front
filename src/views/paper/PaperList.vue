@@ -5,9 +5,6 @@
       <el-input clearable v-model="query.keyword" style="width: 300px" @input="search">
         <template slot="prepend">关键字查询</template>
       </el-input>
-      <el-select clearable v-model="query.majorId" placeholder="选择专业" @change="getPaperList">
-        <el-option v-for="item in majorList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-      </el-select>
       <el-switch @change="getPaperList" inactive-color="lightgray" v-model="query.byMe" active-text="查询我的试卷" />
       <el-switch
         inactive-color="lightgray"
@@ -23,16 +20,16 @@
       <el-table :data="papers" style="width: 100%" height="500">
         <el-table-column fixed align="center" type="index" width="100" label="编号" />
         <el-table-column align="center" prop="name" label="试卷名称" />
-        <el-table-column align="center" prop="subjectName" label="专业名称" />
+        <el-table-column align="center" prop="subjectName" label="考试科目" />
         <el-table-column align="center" prop="operatorName" label="操作人" />
         <el-table-column align="center" prop="totalScore" label="总分" />
         <el-table-column align="center" prop="duration" label="考试时间(分钟)" />
+        <el-table-column align="center" prop="gmtCreate" label="创建时间" width="160" />
         <el-table-column align="center" fixed="right" width="300" label="操作">
           <template slot-scope="scope">
             <el-button @click="cat(scope.row)">查看</el-button>
-            <el-button style="margin-right: 10px" type="success" @click="$router.push(`/paper-edit?id=${scope.row.id}`)"
-              >编辑</el-button
-            >
+            <el-button type="success" @click="$router.push(`/paper-edit?id=${scope.row.id}`)">编辑</el-button>
+            <el-button style="margin-right: 10px" type="primary" @click="openPush(scope.row.id)">推送</el-button>
             <el-popconfirm
               @confirm="delExam(scope.row.id)"
               confirm-button-text="确认"
@@ -88,12 +85,23 @@
         <el-button type="primary" @click="addPaper">确 定</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog custom-class="push" title="推送试卷" center :visible.sync="pushDialog" width="400px">
+      <div class="pushItem">
+        <el-select clearable v-model="pushForm.majorId">
+          <el-option v-for="(item, idx) in byMeMajors" :key="idx" :label="item.name" :value="item.id" />
+        </el-select>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="push" type="primary">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import api from '@/api/paper'
-import major from '@/api/major'
+import teacher from '@/api/teacher'
 import PaperShow from '@/components/PaperShow'
 
 export default {
@@ -102,6 +110,12 @@ export default {
     return {
       loading: false,
       dialogVisible: false,
+      pushForm: {
+        majorId: '',
+        examId: 0
+      },
+      pushDialog: false,
+      byMeMajors: [],
       query: {
         majorId: '',
         byMe: false,
@@ -122,14 +136,13 @@ export default {
         subjectName: '',
         duration: ''
       },
-      majorList: [],
       isLoading: false,
       timer: 0
     }
   },
   mounted() {
+    this.getByMeMajor()
     this.getPaperList()
-    this.getMajorList()
   },
   methods: {
     search() {
@@ -138,6 +151,27 @@ export default {
         this.page.current = 1
         this.getPaperList()
       }, 300)
+    },
+    openPush(id) {
+      this.pushForm.examId = id
+      this.pushDialog = true
+    },
+    push() {
+      if (!this.pushForm.examId || this.pushForm.examId === 0) {
+        this.$message.warning('请先选择要推送的试卷')
+        this.pushDialog = false
+        return
+      }
+
+      if (!this.pushForm.majorId || this.pushForm.majorId === '') {
+        this.$message.warning('请先选择要推送的专业')
+        return
+      }
+
+      api.push(this.pushForm).then(res => {
+        this.$message.success(res.message)
+        this.pushForm.majorId = ''
+      })
     },
     delExam(id) {
       api.delExam(id).then(res => {
@@ -156,11 +190,6 @@ export default {
       this.questions = item.questions || {}
       this.dialogVisible = true
     },
-    getMajorList() {
-      major.majorList().then(res => {
-        this.majorList = res.data
-      })
-    },
     changePage(val) {
       this.page.current = val
       this.getPaperList()
@@ -168,6 +197,21 @@ export default {
     changeSize(val) {
       this.page.size = val
       this.getPaperList()
+    },
+    getByMeMajor() {
+      teacher.byMe().then(res => {
+        this.byMeMajors = res.data
+        let temp = []
+        this.byMeMajors.forEach(item => {
+          temp.push(JSON.stringify({ id: item.majorId, name: item.majorName }))
+        })
+        //去重
+        temp = Array.from(new Set(temp))
+        this.byMeMajors = []
+        temp.forEach(item => {
+          this.byMeMajors.push(JSON.parse(item))
+        })
+      })
     },
     getPaperList() {
       this.loading = true
@@ -187,6 +231,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+:deep(.push .el-dialog__body) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+}
+
 .oper {
   width: 100%;
   display: flex;

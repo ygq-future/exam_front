@@ -23,7 +23,7 @@
           </div>
           <el-divider></el-divider>
           <div class="content">
-            <el-tag v-for="item in byMeMajors" :key="item.id">{{ item.majorName }}</el-tag>
+            <el-tag v-for="item in byMeMajors" :key="item.id">{{ item.name }}</el-tag>
           </div>
         </div>
       </el-card>
@@ -70,20 +70,14 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="推送试卷" center :visible.sync="pushDialog" width="800px">
-      <el-transfer
-        @change="change"
-        v-model="pushValue"
-        :data="uniqueByMeMajors"
-        :props="{
-          key: 'majorId',
-          label: 'majorName'
-        }"
-        :button-texts="['取消推送', '推送']"
-        :titles="['未推送', '已推送']"
-      ></el-transfer>
+    <el-dialog title="推送试卷" center :visible.sync="pushDialog" width="400px">
+      <div class="pushItem">
+        <el-select clearable v-model="form.majorId">
+          <el-option v-for="(item, idx) in byMeMajors" :key="idx" :label="item.name" :value="item.id" />
+        </el-select>
+      </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="pushDialog = false" type="primary">确 定</el-button>
+        <el-button @click="push" type="primary">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -104,13 +98,11 @@ export default {
       byMeMajors: [],
       papers: [],
       majorList: [],
-      pushExamId: 0,
-      pushValue: [],
-      oldPushValue: [],
-      isFirst: true,
       loading: false,
-      //对byMeMajors中majorId和majorName去重
-      uniqueByMeMajors: []
+      form: {
+        examId: 0,
+        majorId: ''
+      }
     }
   },
   mounted() {
@@ -119,59 +111,25 @@ export default {
     this.getMajorList()
   },
   methods: {
-    resetData() {
-      this.pushExamId = 0
-    },
     openPush(id) {
-      this.pushExamId = id
-      this.isFirst = true
-      this.findPushedMajor(this.pushExamId)
+      this.form.examId = id
+      this.pushDialog = true
     },
-    change() {
-      this.isFirst = false
-    },
-    push(majorId) {
-      if (!this.pushExamId || this.pushExamId === 0) {
+    push() {
+      if (!this.form.examId || this.form.examId === 0) {
         this.$message.warning('请先选择要推送的试卷')
         this.pushDialog = false
         return
       }
 
-      paper
-        .push({ examId: this.pushExamId, majorId })
-        .then(res => {
-          this.$message.success(res.message)
-        })
-        .catch(() => {
-          for (let i = 0; i < this.pushValue.length; i++) {
-            if (this.pushValue[i] === majorId) {
-              this.pushValue.splice(i, 1)
-            }
-          }
-        })
-    },
-    cancelPush(majorId) {
-      if (!this.pushExamId || this.pushExamId === 0) {
-        this.$message.warning('请先选择要推送的试卷')
-        this.pushDialog = false
+      if(!this.form.majorId || this.form.majorId === '') {
+        this.$message.warning('请先选择要推送的专业')
         return
       }
 
-      paper
-        .cancelPush({ examId: this.pushExamId, majorId })
-        .then(res => {
-          this.$message.success(res.message)
-        })
-        .catch(() => {
-          this.pushValue.push(majorId)
-        })
-    },
-    findPushedMajor(examId) {
-      this.loading = true
-      paper.findPushed(examId).then(res => {
-        this.pushValue = res.data
-        this.pushDialog = true
-        this.loading = false
+      paper.push(this.form).then(res => {
+        this.$message.success(res.message)
+        this.form.majorId = ''
       })
     },
     applyAuth() {
@@ -180,7 +138,7 @@ export default {
         return
       }
 
-      teacher.applyAuth(this.selected).then(res => {
+      teacher.applyAuth(this.selected).then(() => {
         this.$message.success('申请成功, 等待管理员审核!')
         this.applyDialog = false
       })
@@ -195,12 +153,13 @@ export default {
         this.byMeMajors = res.data
         let temp = []
         this.byMeMajors.forEach(item => {
-          temp.push(JSON.stringify({ majorId: item.majorId, majorName: item.majorName }))
+          temp.push(JSON.stringify({ id: item.majorId, name: item.majorName }))
         })
         //去重
         temp = Array.from(new Set(temp))
+        this.byMeMajors = []
         temp.forEach(item => {
-          this.uniqueByMeMajors.push(JSON.parse(item))
+          this.byMeMajors.push(JSON.parse(item))
         })
       })
     },
@@ -220,23 +179,6 @@ export default {
   },
   computed: {
     ...mapGetters(['user'])
-  },
-  watch: {
-    pushValue(newVal, oldVal) {
-      if (this.isFirst) return
-
-      if (newVal.length > oldVal.length) {
-        let values = newVal.filter(e => !oldVal.includes(e))
-        values.forEach(val => {
-          this.push(val)
-        })
-      } else {
-        let values = oldVal.filter(e => !newVal.includes(e))
-        values.forEach(val => {
-          this.cancelPush(val)
-        })
-      }
-    }
   }
 }
 </script>

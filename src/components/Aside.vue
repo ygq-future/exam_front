@@ -16,73 +16,34 @@
       <span slot="title">仪表盘</span>
     </el-menu-item>
 
-    <el-menu-item index="/teacher-list">
-      <i class="el-icon-user"></i>
-      <span slot="title">教师管理</span>
-    </el-menu-item>
-
-    <!-- <el-submenu index="teacher">
+    <el-submenu index="person">
       <template slot="title">
         <i class="el-icon-user"></i>
-        <span>教师管理</span>
+        <span>人员管理</span>
       </template>
       <el-menu-item index="/teacher-list">教师列表</el-menu-item>
-      <el-menu-item index="/teacher-dashboard">教师仪表盘</el-menu-item>
-    </el-submenu> -->
+      <el-menu-item index="/student-list">学生列表</el-menu-item>
+    </el-submenu>
 
     <el-menu-item index="/major-list">
       <i class="el-icon-date"></i>
       <span slot="title">专业管理</span>
     </el-menu-item>
 
-    <!-- <el-submenu index="major">
-      <template #title>
-        <i class="el-icon-date"></i>
-        <span>专业管理</span>
-      </template>
-      <el-menu-item index="/major-list">专业列表</el-menu-item>
-    </el-submenu> -->
-
     <el-menu-item index="/question-list">
       <i class="el-icon-edit"></i>
       <span slot="title">题目管理</span>
     </el-menu-item>
 
-    <!-- <el-submenu index="question">
-      <template #title>
-        <i class="el-icon-edit"></i>
-        <span>题目管理</span>
-      </template>
-      <el-menu-item index="/question-list">题目列表</el-menu-item>
-      <el-menu-item index="/question-edit">编辑题目</el-menu-item>
-    </el-submenu> -->
-
-    <el-menu-item index="/paper-list">
-      <i class="el-icon-document"></i>
-      <span slot="title">试卷管理</span>
-    </el-menu-item>
-
-    <!-- <el-submenu index="paper">
+    <el-submenu index="paper">
       <template #title>
         <i class="el-icon-document"></i>
-        <span>试卷管理</span>
+        <span>考试管理</span>
       </template>
       <el-menu-item index="/paper-list">试卷列表</el-menu-item>
-      <el-menu-item index="/paper-edit">编辑试卷</el-menu-item>
-    </el-submenu> -->
-
-    <el-menu-item index="/student-list">
-      <i class="el-icon-school"></i>
-      <span slot="title">学生管理</span>
-    </el-menu-item>
-
-    <!-- <el-submenu index="student">
-      <template #title>
-        <i class="el-icon-school"></i>
-        <span>学生管理</span>
-      </template>
-      <el-menu-item index="/student-list">学生列表</el-menu-item>
-    </el-submenu> -->
+      <el-menu-item index="/examing-paper">开考试卷</el-menu-item>
+      <el-menu-item index="/scoring">主观评分</el-menu-item>
+    </el-submenu>
 
     <el-submenu index="statistics">
       <template #title>
@@ -108,7 +69,7 @@ export default {
   data() {
     return {
       active: '',
-      openeds: ['teacher', 'major', 'question', 'paper', 'student', 'statistics', 'system'],
+      openeds: ['person', 'major', 'question', 'paper'],
       isCollapse: false
     }
   },

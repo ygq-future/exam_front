@@ -26,8 +26,7 @@
     <!-- 页面表格区域 -->
     <el-main height="100%">
       <el-table :data="studentList" style="width: 100%" border stripe height="550">
-        <el-table-column prop="studentNo" label="学号" width="180" align="center" style="boder: none">
-        </el-table-column>
+        <el-table-column prop="studentNo" label="学号" width="180" align="center" style="boder: none"> </el-table-column>
         <el-table-column prop="name" label="姓名" width="180" align="center"> </el-table-column>
         <el-table-column prop="clazzName" label="班级" width="200" align="center"> </el-table-column>
         <el-table-column prop="majorName" label="专业" align="center" width="180"> </el-table-column>
@@ -39,13 +38,9 @@
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="danger" size="small" v-show="scope.row.locked === 0" @click="lock(scope.row.id)"
-              >锁定账户</el-button
-            >
+            <el-button type="danger" size="small" v-show="scope.row.locked === 0" @click="lock(scope.row.id)">锁定账户</el-button>
 
-            <el-button type="success" size="small" v-show="scope.row.locked !== 0" @click="lock(scope.row.id)"
-              >解锁账户</el-button
-            >
+            <el-button type="success" size="small" v-show="scope.row.locked !== 0" @click="lock(scope.row.id)">解锁账户</el-button>
           </template>
         </el-table-column>
       </el-table>

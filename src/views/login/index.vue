@@ -5,17 +5,13 @@
         <i class="el-icon-user-solid login-icon"></i>
         <span class="login-text">LOGIN</span>
         <div class="form">
-          <el-input
-            prefix-icon="el-icon-user"
-            v-model="form.username"
-            class="login-input"
-            placeholder="用户名"
-          ></el-input>
+          <el-input prefix-icon="el-icon-user" v-model="form.username" class="login-input" placeholder="用户名"></el-input>
           <el-input
             prefix-icon="el-icon-unlock"
             v-model="form.password"
             show-password
             type="password"
+            @keydown.native.enter="login"
             class="login-input"
             placeholder="密码"
           ></el-input>
@@ -31,18 +27,8 @@
         <i class="el-icon-user-solid register-icon"></i>
         <span class="register-text">REGISTER</span>
         <div class="form">
-          <el-input
-            prefix-icon="el-icon-user"
-            v-model="form.name"
-            class="login-input"
-            placeholder="姓名"
-          ></el-input>
-          <el-input
-            prefix-icon="el-icon-edit"
-            v-model="form.teacherNo"
-            class="login-input"
-            placeholder="工号"
-          ></el-input>
+          <el-input prefix-icon="el-icon-user" v-model="form.name" class="login-input" placeholder="姓名"></el-input>
+          <el-input prefix-icon="el-icon-edit" v-model="form.teacherNo" class="login-input" placeholder="工号"></el-input>
           <el-input
             prefix-icon="el-icon-unlock"
             type="password"
@@ -66,31 +52,31 @@
 <script>
 import api from '@/api/user'
 import { mapActions, mapGetters } from 'vuex'
-import cookies from "vue-cookies"
+import cookies from 'vue-cookies'
 
 export default {
   data() {
     return {
       form: {
-        rememberMe: false,
-      },
+        rememberMe: false
+      }
     }
   },
   mounted() {
-    let userCookie = cookies.get("user")
-    if(this.user || userCookie) {
+    let userCookie = cookies.get('user')
+    if (this.user || userCookie) {
       this.$router.replace('/')
     }
   },
   methods: {
-    ...mapActions(["setUser"]),
+    ...mapActions(['setUser']),
     login() {
       api.login(this.form).then(res => {
         this.$message.success(res.message)
         let user = res.data
         delete user.roles
         this.setUser(user)
-        cookies.set("user", JSON.stringify(user))
+        cookies.set('user', JSON.stringify(user))
         this.$router.replace('/')
       })
     },
@@ -101,7 +87,7 @@ export default {
       })
     },
     changeLogin() {
-      this.form = {rememberMe: false}
+      this.form = { rememberMe: false }
       this.$refs.right.style.opacity = 0
       this.$refs.img.style.transform = 'translateX(0)'
       this.$refs.left.style.opacity = 1
@@ -111,10 +97,10 @@ export default {
       this.$refs.left.style.opacity = 0
       this.$refs.img.style.transform = 'translateX(-100%)'
       this.$refs.right.style.opacity = 1
-    },
+    }
   },
   computed: {
-    ...mapGetters(["user"])
+    ...mapGetters(['user'])
   }
 }
 </script>
@@ -164,6 +150,7 @@ $imgTime: 0.8s;
 }
 
 .right {
+  opacity: 0;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -201,6 +188,7 @@ $imgTime: 0.8s;
     height: 100%;
     z-index: 1000;
     transition: $imgTime all;
+    opacity: 0.7;
   }
 }
 

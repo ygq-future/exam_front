@@ -57,6 +57,16 @@ const routes = [
         component: () => import('@/views/paper/PaperList.vue')
       },
       {
+        path: '/examing-paper',
+        name: 'examingPaper',
+        component: () => import('@/views/paper/ExamingPaperList.vue')
+      },
+      {
+        path: '/scoring',
+        name: 'scoring',
+        component: () => import('@/views/paper/Scoring.vue')
+      },
+      {
         path: '/paper-edit',
         name: 'paperEdit',
         component: () => import('@/views/paper/PaperEdit.vue')

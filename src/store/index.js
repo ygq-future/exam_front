@@ -9,7 +9,7 @@ export default new Vuex.Store({
   },
   getters: {
     userInfo(state) {
-      return state.user?.userInfo
+      return state.user?.userInfo || {}
     },
     user(state) {
       return state.user

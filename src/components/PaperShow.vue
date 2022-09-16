@@ -29,9 +29,7 @@
           <div class="selects" v-if="item.typeId === 2">
             <div v-for="(select, sidx) in item.selects" :key="sidx">
               {{ `${items[sidx]}、` }}
-              <el-tag :type="item.answer.split(',').includes(select.id + '') ? 'success' : 'info'">{{
-                select.description
-              }}</el-tag>
+              <el-tag :type="item.answer.split(',').includes(select.id + '') ? 'success' : 'info'">{{ select.description }}</el-tag>
             </div>
           </div>
 
@@ -96,44 +94,44 @@ export default {
 
 <style lang="scss" scoped>
 .delete {
-  margin-left: 15px;
-  color: red;
-  cursor: pointer;
+  margin-left: 15px !important;
+  color: red !important;
+  cursor: pointer !important;
 }
 
 .list {
-  padding: 0 20px;
+  padding: 0 20px !important;
 
   .item {
-    margin-bottom: 20px;
+    margin-bottom: 20px !important;
   }
 }
 
 .selects {
-  padding-left: 20px;
+  padding-left: 20px !important;
 
   div {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
+    display: flex !important;
+    align-items: center !important;
+    margin-bottom: 10px !important;
   }
 }
 
 .box {
-  width: 100%;
-  height: 450px;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  padding: 20px 0;
+  width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: scroll !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 20px 0 !important;
 
   .type {
-    padding: 0 20px;
-    margin-bottom: 15px;
+    padding: 0 20px !important;
+    margin-bottom: 15px !important;
     .title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 10px;
+      font-size: 18px !important;
+      font-weight: 700 !important;
+      margin-bottom: 10px !important;
     }
   }
 }

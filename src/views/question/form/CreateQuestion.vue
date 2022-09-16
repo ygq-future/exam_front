@@ -25,16 +25,31 @@
         </el-form-item>
 
         <!-- 单选题表单 -->
-        <el-form-item v-show="params.typeId === 1" v-for="(item, index) in params.selectQuestions" :key="index">
-          <el-input v-model="item.description">
-            <template slot="prepend">
-              <el-radio v-model="params.answer" :label="createIndex(item, index)" />
-            </template>
-            <template slot="append">
-              <el-button @click="delOpt(item)">删除</el-button>
-            </template>
-          </el-input>
-        </el-form-item>
+        <div v-if="params.typeId === 1">
+          <el-form-item v-for="(item, index) in params.selectQuestions" :key="index">
+            <el-input v-model="item.description">
+              <template slot="prepend">
+                <el-radio v-model="params.answer" :label="createIndex(item, index)" />
+              </template>
+              <template slot="append">
+                <el-button @click="delOpt(item)">删除</el-button>
+              </template>
+            </el-input>
+          </el-form-item>
+        </div>
+        <!-- 多选表单 -->
+        <div v-if="params.typeId === 2">
+          <el-form-item v-for="(item, index) in params.selectQuestions" :key="index">
+            <el-input v-model="item.description">
+              <template #prepend>
+                <el-checkbox :label="createIndex(item, index)" v-model="checkData"></el-checkbox>
+              </template>
+              <template slot="append">
+                <el-button @click="delOpt(item)">删除</el-button>
+              </template>
+            </el-input>
+          </el-form-item>
+        </div>
         <!-- 简答表单 -->
         <el-form-item>
           <el-input
@@ -43,17 +58,6 @@
             placeholder="请输入答案"
             v-show="params.typeId != 1 && params.typeId != 2 && params.typeId != 4"
           ></el-input>
-        </el-form-item>
-        <!-- 多选表单 -->
-        <el-form-item v-show="params.typeId === 2" v-for="(item, index) in params.selectQuestions" :key="index">
-          <el-input v-model="item.description">
-            <template #prepend>
-              <el-checkbox :label="createIndex(item, index)" v-model="checkData"></el-checkbox>
-            </template>
-            <template slot="append">
-              <el-button @click="delOpt(item)">删除</el-button>
-            </template>
-          </el-input>
         </el-form-item>
         <el-form-item v-show="params.typeId === 4">
           <el-radio-group v-model="params.answer" class="form">
@@ -70,6 +74,7 @@
 import util from './util'
 import Matrix from './Matrix.vue'
 import question from '@/api/question'
+import { Loading } from 'element-ui'
 export default {
   data: () => ({
     questionData: {
@@ -135,8 +140,8 @@ export default {
     },
     close() {
       this.visible = false
+      this.$emit('update')
     },
-
     // 获取全部题目类型
     async getType() {
       const res = await question.getType()
@@ -157,27 +162,37 @@ export default {
         description: ''
       })
     },
-    async submit() {
+    submit() {
       if (this.params.typeId === 2) {
         this.params.answer = this.checkData.toString()
       }
-      await question.add({ ...this.params, typeName: this.typeName })
-      const params = {
-        typeId: this.params.typeId,
-        title: '',
-        score: '',
-        answer: '',
-        selectQuestions: [
-          {
-            description: ''
+      let loadingInstance = Loading.service({ fullscreen: true })
+      question
+        .add({ ...this.params, typeName: this.typeName })
+        .then(res => {
+          this.$message({
+            message: res.message
+          })
+
+          const params = {
+            typeId: this.params.typeId,
+            title: '',
+            score: '',
+            answer: '',
+            selectQuestions: [
+              {
+                description: ''
+              }
+            ]
           }
-        ]
-      }
-      this.params = { ...params }
-      this.$message({
-        message: '添加成功'
-      })
-      this.$emit('update')
+
+          this.params = { ...params }
+
+          loadingInstance.close()
+        })
+        .catch(() => {
+          loadingInstance.close()
+        })
     }
   },
   components: { Matrix }

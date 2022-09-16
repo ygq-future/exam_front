@@ -17,8 +17,18 @@
           />
         </div>
         <div class="btns">
-          <el-button size="medium" :type="questionData.answer === '0' ? 'primary' : ''" @click="questionData.answer = '0'">错误</el-button>
-          <el-button size="medium" :type="questionData.answer === '1' ? 'primary' : ''" @click="questionData.answer = '1'">正确 </el-button>
+          <el-button
+            size="medium"
+            :type="questionData.answer === '0' ? 'primary' : ''"
+            @click="questionData.answer = '0'"
+            >错误</el-button
+          >
+          <el-button
+            size="medium"
+            :type="questionData.answer === '1' ? 'primary' : ''"
+            @click="questionData.answer = '1'"
+            >正确
+          </el-button>
         </div>
       </template>
     </Matrix>
@@ -26,37 +36,38 @@
 </template>
 
 <script>
-import util from "./util.js";
-import Matrix from "./Matrix.vue";
-import question from "@/api/question";
+import util from './util.js'
+import Matrix from './Matrix.vue'
+import question from '@/api/question'
+import { Loading } from 'element-ui'
 export default {
-  props: ["id"],
+  props: ['id'],
   data: () => ({
     questionData: {
-      selects: [],
+      selects: []
     },
-    visible: false,
+    visible: false
   }),
   methods: {
     //初始化方法
     async init() {
-      this.visible = true;
+      this.visible = true
       //拿到处理后的数据
-      const res = await question.queryByID(this.id);
-      this.questionData = res.data;
+      const res = await question.queryByID(this.id)
+      this.questionData = res.data
     },
     createIndex(index, row) {
-      return util.createIndex(index, row);
+      return util.createIndex(index, row)
     },
     //单纯将index转为字母并返回
     createIndex(item, index) {
-      return util.createIndex(index, item);
+      return util.createIndex(index, item)
     },
     temporarySave(bool) {
       if (bool) {
-        this.questionData.tip = this.questionData.title;
+        this.questionData.tip = this.questionData.title
       } else {
-        this.questionData.tipAnswer = this.questionData.answer;
+        this.questionData.tipAnswer = this.questionData.answer
       }
     },
     async edit(item) {
@@ -66,30 +77,33 @@ export default {
         //验证表单是否已经修改,如果没有修改,直接将状态改为编辑,之后直接返回
         if (item.tip === item.description) {
           this.$message({
-            message: "未做任何更改",
-          });
-          return;
+            message: '未做任何更改'
+          })
+          return
         }
         //表单通过验证后,直接触发提交事件
-        await question.editQuestion(item.id, { ...item });
+        await question.editQuestion(item.id, { ...item })
       }
       //如果表单咩有时间属性,则走新加选项方法
       else {
-        await question.addQuestion({ ...item });
+        await question.addQuestion({ ...item })
       }
     },
     close() {
-      this.visible = false;
+      this.visible = false
     },
     async submit() {
-      await question.changeQuestion({ ...this.questionData });
-      await this.init();
+      let loadingInstance = Loading.service({ fullscreen: true })
+      await question.changeQuestion({ ...this.questionData })
+      loadingInstance.close()
+      this.$message.success('修改成功')
+      await this.init()
       this.close()
       this.$emit('update')
-    },
+    }
   },
-  components: { Matrix },
-};
+  components: { Matrix }
+}
 </script>
 
 <style scoped lang="scss">

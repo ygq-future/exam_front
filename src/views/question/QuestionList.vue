@@ -27,13 +27,14 @@
     <el-main>
       <el-table :data="dataList" height="530px">
         <el-table-column prop="id" label="ID" width="50" align="center"></el-table-column>
-        <el-table-column prop="typeName" label="题目类型" width="100" align="center"></el-table-column>
-        <el-table-column prop="title" label="题目标题"></el-table-column>
-        <el-table-column label="答案">
+        <el-table-column prop="typeName" label="题目类型" width="120" align="center"></el-table-column>
+        <el-table-column prop="title" align="center" label="题目标题"></el-table-column>
+        <el-table-column align="center" label="答案">
           <template slot-scope="scope">
             {{ getAnswer(scope.row) }}
           </template>
         </el-table-column>
+        <el-table-column prop="score" label="分数" align="center" width="50"/>
         <el-table-column prop="gmtModified" label="修改时间" align="center" />
         <el-table-column label="操作" align="center" width="250">
           <template slot-scope="scope">

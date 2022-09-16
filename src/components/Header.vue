@@ -5,9 +5,7 @@
       <h1>考试后台管理系统</h1>
     </div>
     <div class="user">
-      <el-avatar style="background-color: #1c6b48">{{
-        userInfo?.name[0]
-      }}</el-avatar>
+      <el-avatar src="https://ygq-img.oss-cn-hangzhou.aliyuncs.com/2022/09/14/avatar.jpg"></el-avatar>
       <el-dropdown>
         <span class="el-dropdown-link">
           <span>{{ userInfo?.name }}</span>
@@ -16,44 +14,28 @@
 
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item
-              ><span class="full" @click="getUserInfo"
-                >用户信息</span
-              ></el-dropdown-item
-            >
-            <el-dropdown-item
-              ><span class="full" @click="logout"
-                >退出登录</span
-              ></el-dropdown-item
-            >
+            <el-dropdown-item><span class="full" @click="getUserInfo">用户信息</span></el-dropdown-item>
+            <el-dropdown-item><span class="full" @click="logout">退出登录</span></el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
     </div>
 
-    <el-dialog
-      center
-      custom-class="dialog"
-      title="用户信息"
-      :visible.sync="showDialog"
-      width="400px"
-      :close-on-click-modal="false"
-    >
-
-    <el-form label-width="60px">
-      <el-form-item label="名称">
-        <el-input :value="user?.userInfo?.name" disabled/>
-      </el-form-item>
-      <el-form-item label="用户名">
-        <el-input :value="user?.username" disabled/>
-      </el-form-item>
-      <el-form-item label="工号" v-if="user?.type == 1">
-        <el-input :value="user?.userInfo?.teacherNo" disabled/>
-      </el-form-item>
-      <el-form-item label="身份">
-        <el-input :value="user?.type == 0 ? '管理员' : '教师'" disabled/>
-      </el-form-item>
-    </el-form>
+    <el-dialog center custom-class="dialog" title="用户信息" :visible.sync="showDialog" width="400px" :close-on-click-modal="false">
+      <el-form label-width="60px">
+        <el-form-item label="名称">
+          <el-input :value="userInfo?.name" disabled />
+        </el-form-item>
+        <el-form-item label="用户名">
+          <el-input :value="user?.username" disabled />
+        </el-form-item>
+        <el-form-item label="工号" v-if="user?.type == 1">
+          <el-input :value="userInfo?.teacherNo" disabled />
+        </el-form-item>
+        <el-form-item label="身份">
+          <el-input :value="user?.type == 0 ? '管理员' : '教师'" disabled />
+        </el-form-item>
+      </el-form>
 
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="showDialog = false">确 定</el-button>
@@ -71,7 +53,7 @@ export default {
   data() {
     return {
       showDialog: false,
-      info: {},
+      info: {}
     }
   },
   methods: {
@@ -80,10 +62,10 @@ export default {
       this.$confirm('确认注销登录吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning',
+        type: 'warning'
       })
         .then(() => {
-          api.logout().then((res) => {
+          api.logout().then(res => {
             this.$message.success(res.message)
             this.$router.replace('/login')
             this.setUser(null)
@@ -93,20 +75,20 @@ export default {
         .catch(() => {
           this.$message({
             type: 'info',
-            message: '取消操作',
+            message: '取消操作'
           })
         })
     },
     getUserInfo() {
       this.showDialog = true
-      api.userInfo().then((res) => {
+      api.userInfo().then(res => {
         this.info = res.data
       })
-    },
+    }
   },
   computed: {
-    ...mapGetters(['userInfo', 'user']),
-  },
+    ...mapGetters(['userInfo', 'user'])
+  }
 }
 </script>
 
