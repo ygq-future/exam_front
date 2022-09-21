@@ -37,7 +37,7 @@
               style="margin-right: 10px"
               type="primary"
               @click="openExamingDialog(scope.row.id)"
-              >{{ scope.row.status === 0 ? '开考' : '编辑' }}</el-button
+              >{{ scope.row.status === 0 ? '开考' : '修改' }}</el-button
             >
 
             <el-popconfirm

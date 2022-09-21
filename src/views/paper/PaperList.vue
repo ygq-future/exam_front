@@ -73,7 +73,9 @@
           <el-input v-model="form.name" placeholder="请输入试卷名称"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="form.subjectName" placeholder="请输入学科名称"></el-input>
+          <el-select clearable @change="onChange" style="width: 100%" v-model="form.subjectId" placeholder="选择学科">
+            <el-option v-for="item in subjectList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-input v-model="form.duration" placeholder="请输入考试时长" type="number"></el-input>
@@ -103,6 +105,7 @@
 import api from '@/api/paper'
 import teacher from '@/api/teacher'
 import PaperShow from '@/components/PaperShow'
+import subject from '@/api/subject'
 
 export default {
   components: { PaperShow },
@@ -116,6 +119,7 @@ export default {
       },
       pushDialog: false,
       byMeMajors: [],
+      subjectList: [],
       query: {
         majorId: '',
         byMe: false,
@@ -134,7 +138,8 @@ export default {
       form: {
         name: '',
         subjectName: '',
-        duration: ''
+        duration: '',
+        subjectId: ''
       },
       isLoading: false,
       timer: 0
@@ -145,6 +150,13 @@ export default {
     this.getPaperList()
   },
   methods: {
+    onChange(id) {
+      this.subjectList.forEach(item => {
+        if (item.id === id) {
+          this.form.subjectName = item.name
+        }
+      })
+    },
     search() {
       clearTimeout(this.timer)
       setTimeout(() => {
@@ -198,6 +210,11 @@ export default {
       this.page.size = val
       this.getPaperList()
     },
+    getSubjectList() {
+      subject.subjectList().then(res => {
+        this.subjectList = res.data
+      })
+    },
     getByMeMajor() {
       teacher.byMe().then(res => {
         this.byMeMajors = res.data
@@ -224,6 +241,7 @@ export default {
         this.page.total = res.data.total
         this.isLoading = false
         this.loading = false
+        this.getSubjectList()
       })
     }
   }

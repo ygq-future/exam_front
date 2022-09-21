@@ -12,6 +12,7 @@
         <el-table-column align="center" prop="examObj.name" label="试卷名称" />
         <el-table-column align="center" prop="examObj.subjectName" label="科目" />
         <el-table-column align="center" prop="studentName" label="学生" />
+        <el-table-column align="center" prop="gmtModified" label="提交时间" />
         <el-table-column align="center" label="操作" fixed="right" width="200">
           <template slot-scope="scope">
             <el-button type="primary" @click="openScoring(scope.row)">打分</el-button>

@@ -18,13 +18,19 @@ export default {
     return http({
       method: 'post',
       url: '/teacher',
-      data 
+      data
     })
   },
   userInfo() {
     return http({
       method: 'get',
-      url: "/user/info"
+      url: '/user/info'
+    })
+  },
+  createToken() {
+    return http({
+      method: 'get',
+      url: '/user/createToken'
     })
   }
 }

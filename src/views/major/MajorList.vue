@@ -1,6 +1,6 @@
 <template>
-  <div v-loading="loading" class="content">
-    <el-card class="card">
+  <div class="content">
+    <el-card class="card" v-loading="majorLoading">
       <el-alert title="学院列表信息" type="info" show-icon center :closable="false" />
       <el-button type="primary" size="mini" style="margin: 15px 0" @click="add(null)">添加学院</el-button>
       <el-tree :data="collegeList" :props="{ label: 'name' }" node-key="id" default-expand-all :expand-on-click-node="false">
@@ -26,6 +26,32 @@
       </el-tree>
     </el-card>
 
+    <el-card class="card" v-loading="subjectLoading">
+      <el-alert title="学科信息列表" type="info" show-icon center :closable="false" />
+      <el-button type="primary" style="margin: 15px 0" @click="openAdd">添加</el-button>
+      <el-table :data="subjectList" style="width: 100%" height="400">
+        <el-table-column prop="id" label="编号" align="center" />
+        <el-table-column prop="name" label="学科" align="center" />
+        <el-table-column prop="gmtCreate" label="操作" align="center">
+          <template slot-scope="scope">
+            <el-button type="primary" @click="openEdit(scope.row)">修改</el-button>
+            <el-popconfirm
+              style="margin-left: 10px"
+              @confirm="removeSubject(scope.row.id)"
+              confirm-button-text="确认"
+              cancel-button-text="取消"
+              icon="el-icon-info"
+              cancel-button-type="info"
+              icon-color="red"
+              title="确定删除此项吗?"
+            >
+              <el-button type="danger" slot="reference">删除</el-button>
+            </el-popconfirm>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+
     <el-dialog :close-on-click-modal="false" :title="title" :visible.sync="addDialog" width="400px" center>
       <el-form class="mybox" inline>
         <el-form-item label="名称">
@@ -39,26 +65,83 @@
         <el-button type="primary" @click="submit">确 定</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog :close-on-click-modal="false" title="编辑学科" :visible.sync="subjectDialog" width="400px" center>
+      <el-form class="mybox" inline>
+        <el-form-item label="名称">
+          <el-input placeholder="请输入学科名称" v-model="form.name" />
+          <!-- 隐藏input框,防止回车提交表单 -->
+          <input type="text" style="display: none" />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="subjectDialog = false">取 消</el-button>
+        <el-button type="primary" @click="subjectSubmit">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import major from '@/api/major'
+import subject from '@/api/subject'
 
 export default {
   data() {
     return {
       addDialog: false,
-      loading: false,
+      subjectDialog: false,
+      majorLoading: false,
+      subjectLoading: false,
       collegeList: [],
+      subjectList: [],
       form: {},
-      title: ''
+      title: '',
+      subjectStatus: 0
     }
   },
   mounted() {
     this.getCollegeList()
+    this.getSubjectList()
   },
   methods: {
+    openEdit(data) {
+      this.subjectStatus = 1
+      this.form.id = data.id
+      this.$set(this.form, 'name', data.name)
+      this.subjectDialog = true
+    },
+    openAdd() {
+      this.subjectStatus = 0
+      delete this.form.id
+      this.$set(this.form, 'name', '')
+      this.subjectDialog = true
+    },
+    subjectSubmit() {
+      if (this.subjectStatus === 0) {
+        subject.add(this.form).then(res => this.subjectCb(res))
+      } else if (this.subjectStatus === 1) {
+        subject.edit(this.form).then(res => this.subjectCb(res))
+      }
+    },
+    subjectCb(res) {
+      this.$message.success(res.message)
+      this.getSubjectList()
+      this.subjectDialog = false
+    },
+    removeSubject(id) {
+      subject.remove(id).then(res => {
+        this.$message.success(res.message)
+        this.getSubjectList()
+      })
+    },
+    getSubjectList() {
+      this.subjectLoading = true
+      subject.subjectList().then(res => {
+        this.subjectList = res.data
+        this.subjectLoading = false
+      })
+    },
     remove(data) {
       switch (data.type) {
         case 0:
@@ -138,10 +221,10 @@ export default {
       this.addDialog = true
     },
     getCollegeList() {
-      this.loading = true
+      this.majorLoading = true
       major.collegeList().then(res => {
         this.collegeList = res.data
-        this.loading = false
+        this.majorLoading = false
 
         this.collegeList.forEach(college => {
           college.type = 0
@@ -162,11 +245,10 @@ export default {
 .content {
   width: 100%;
   display: flex;
-  flex-direction: column;
-  // align-items: center;
 
   .card {
-    width: 700px;
+    flex: 1;
+    width: 500px;
     height: 650px;
     overflow-y: auto;
   }

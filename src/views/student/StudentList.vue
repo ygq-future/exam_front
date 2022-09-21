@@ -1,35 +1,36 @@
 <template>
   <el-container v-loading="loading">
-    <el-header height="60">
-      <el-row :gutter="10">
-        <el-col :span="4">
-          <!--两个选项框 -->
-          <el-select v-model="query.majorId" placeholder="请选择专业" filterable clearable @change="majorChange">
-            <el-option v-for="item in majorData" :key="item.id" :label="item.name" :value="item.id"> </el-option>
-          </el-select>
-        </el-col>
-        <!-- 班级选项卡 -->
-        <el-col :span="4">
-          <el-select v-model="query.clazzId" placeholder="请选择班级" filterable clearable @change="getStudent">
-            <el-option v-for="item in children" :key="item.id" :label="item.name" :value="item.id"> </el-option>
-          </el-select>
-        </el-col>
+    <el-header class="header">
+      <div class="item">
+        <el-button type="primary" @click="dialogVisible = true">批量导入</el-button>
+        <el-button type="success" @click="downloadExample">下载导入模板</el-button>
+      </div>
 
-        <el-col :span="7">
-          <el-input clearable placeholder="请输入关键字" v-model="query.keyword" @input="searchStudent">
-            <template slot="prepend">关键字查找</template>
-          </el-input>
-        </el-col>
-      </el-row>
+      <div class="item">
+        <!--两个选项框 -->
+        <el-select v-model="query.majorId" placeholder="请选择专业" filterable clearable @change="majorChange">
+          <el-option v-for="item in majorData" :key="item.id" :label="item.name" :value="item.id"> </el-option>
+        </el-select>
+
+        <!-- 班级选项卡 -->
+        <el-select v-model="query.clazzId" placeholder="请选择班级" filterable clearable @change="getStudent">
+          <el-option v-for="item in children" :key="item.id" :label="item.name" :value="item.id"> </el-option>
+        </el-select>
+
+        <el-input clearable placeholder="请输入关键字" v-model="query.keyword" @input="searchStudent">
+          <template slot="prepend">关键字查找</template>
+        </el-input>
+      </div>
     </el-header>
 
     <!-- 页面表格区域 -->
-    <el-main height="100%">
-      <el-table :data="studentList" style="width: 100%" border stripe height="550">
-        <el-table-column prop="studentNo" label="学号" width="180" align="center" style="boder: none"> </el-table-column>
-        <el-table-column prop="name" label="姓名" width="180" align="center"> </el-table-column>
-        <el-table-column prop="clazzName" label="班级" width="200" align="center"> </el-table-column>
-        <el-table-column prop="majorName" label="专业" align="center" width="180"> </el-table-column>
+    <el-main>
+      <el-table :data="studentList" style="width: 100%" stripe height="500">
+        <el-table-column prop="studentNo" label="学号" align="center" />
+        <el-table-column prop="name" label="姓名" align="center" />
+        <el-table-column prop="collegeName" label="学院" align="center" />
+        <el-table-column prop="clazzName" label="班级" align="center" />
+        <el-table-column prop="majorName" label="专业" align="center" />
         <el-table-column label="账号状态" align="center">
           <template slot-scope="scope">
             <el-tag type="info" v-show="scope.row.locked !== 0">已锁定</el-tag>
@@ -60,13 +61,42 @@
       >
       </el-pagination>
     </el-footer>
+
+    <el-dialog
+      center
+      title="上传文件"
+      :visible.sync="dialogVisible"
+      width="400px"
+      :close-on-click-modal="false"
+      @close="$refs.importRef.clearFiles()"
+    >
+      <el-upload
+        ref="importRef"
+        :before-upload="beforeUpload"
+        drag
+        :limit="1"
+        :multiple="false"
+        :auto-upload="false"
+        :http-request="importStudent"
+        action="https://jsonplaceholder.typicode.com/posts/"
+      >
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      </el-upload>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="$refs.importRef.submit()">确 定</el-button>
+      </span>
+    </el-dialog>
   </el-container>
 </template>
 <script>
 import student from '@/api/student'
 import major from '@/api/major'
+import user from '@/api/user'
+import { Loading } from 'element-ui'
 export default {
   data: () => ({
+    dialogVisible: false,
     loading: false,
     majorData: [],
     studentList: [],
@@ -93,6 +123,41 @@ export default {
     }
   },
   methods: {
+    beforeUpload(file) {
+      const type = file.type
+      if (type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || type === 'application/vnd.ms-excel') {
+        return true
+      }
+      this.$message.warning('只能上传excel文件!')
+      return false
+    },
+    importStudent(file) {
+      let formData = new FormData()
+      formData.append('file', file.file)
+      let loadingInstance = Loading.service({ fullscreen: true })
+      student.batchImport(formData).then(res => {
+        if (res.data) {
+          this.$notify({
+            title: '异常提示',
+            message: res.data,
+            type: 'warning',
+            duration: 0
+          })
+        } else {
+          this.$message.success(res.message)
+        }
+
+        this.$refs.importRef.clearFiles()
+        this.dialogVisible = false
+        this.getStudent()
+        loadingInstance.close()
+      })
+    },
+    async downloadExample() {
+      let { data } = await user.createToken()
+      let uri = student.downloadUri(data)
+      window.open(this.$baseUrl + uri)
+    },
     searchStudent() {
       clearTimeout(this.timer)
       setTimeout(() => {
@@ -118,9 +183,6 @@ export default {
     getStudent() {
       //验证参数,如果个别删除没有则直接删除参数
       const query = { ...this.query, ...this.page }
-      if (query.majorId === '') return
-      if (this.query.clazzId === '') delete query.clazzId
-      if (this.query.keyword === '') delete query.keyword
 
       this.loading = true
       //处理返回的数据
@@ -160,6 +222,26 @@ export default {
 }
 </script>
 <style scoped lang="scss">
+.header {
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+
+  .item {
+    display: flex;
+    margin-bottom: 10px;
+
+    * {
+      margin-right: 10px;
+    }
+
+    .el-input {
+      width: fit-content;
+    }
+  }
+}
+
 .el-button {
   margin: 0;
 }

@@ -27,7 +27,7 @@
 
     <el-menu-item index="/major-list">
       <i class="el-icon-date"></i>
-      <span slot="title">专业管理</span>
+      <span slot="title">专业学科</span>
     </el-menu-item>
 
     <el-menu-item index="/question-list">

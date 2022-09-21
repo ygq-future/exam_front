@@ -7,7 +7,9 @@
         <el-alert title="修改试卷信息" type="info" show-icon center :closable="false" />
         <el-form>
           <el-input v-model="form.name" placeholder="试卷名称"></el-input>
-          <el-input v-model="form.subjectName" placeholder="专业名称"></el-input>
+          <el-select clearable @change="onChange" style="width: 100%; margin-bottom: 15px" v-model="form.subjectId" placeholder="选择学科">
+            <el-option v-for="item in subjectList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
           <el-input v-model.number="form.duration" type="number" placeholder="考试时长"></el-input>
           <el-button type="primary" style="width: 100%" @click="updatePaper">确认</el-button>
         </el-form>
@@ -62,14 +64,7 @@
             </el-radio-group>
           </div>
 
-          <el-input
-            resize="none"
-            :rows="20"
-            type="textarea"
-            placeholder="请输入内容"
-            @input="analyze"
-            v-model="content"
-          />
+          <el-input resize="none" :rows="20" type="textarea" placeholder="请输入内容" @input="analyze" v-model="content" />
         </div>
 
         <el-divider direction="vertical"></el-divider>
@@ -90,6 +85,7 @@
 <script>
 import api from '@/api/paper'
 import question from '@/api/question'
+import subject from '@/api/subject'
 import PaperShow from '@/components/PaperShow'
 
 export default {
@@ -98,6 +94,7 @@ export default {
     return {
       loading: false,
       dialogVisible: false,
+      subjectList: [],
       //试卷id
       id: 0,
       //试卷对象
@@ -106,7 +103,8 @@ export default {
       form: {
         name: '',
         subjectName: '',
-        duration: 0
+        duration: 0,
+        subjectId: ''
       },
       //已选择的题目名称(用于添加关联题目)
       selected: '',
@@ -162,6 +160,13 @@ $简答题$10
     this.getById()
   },
   methods: {
+    onChange(id) {
+      this.subjectList.forEach(item => {
+        if (item.id === id) {
+          this.form.subjectName = item.name
+        }
+      })
+    },
     submit() {
       //如果有错误就不能进行添加
       if (this.illegal.value) {
@@ -481,12 +486,18 @@ $简答题$10
         this.getById()
       })
     },
+    getSubjectList() {
+      subject.subjectList().then(res => {
+        this.subjectList = res.data
+      })
+    },
     getById() {
       this.loading = true
       api.getById(this.id).then(res => {
         this.paper = res.data
-        let { name, subjectName, duration } = this.paper
-        this.form = { name, subjectName, duration }
+        let { name, subjectName, duration, subjectId } = this.paper
+        this.form = { name, subjectName, duration, subjectId }
+        this.getSubjectList()
         this.loading = false
       })
       question.getType().then(res => {

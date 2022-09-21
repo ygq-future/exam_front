@@ -14,7 +14,7 @@ const routes = [
   {
     path: '/',
     name: 'layout',
-    redirect: "/content",
+    redirect: '/content',
     component: () => import('@/components/Layout.vue'),
     children: [
       {
@@ -99,7 +99,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: 'hash',
   base: process.env.BASE_URL,
   routes
 })

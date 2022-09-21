@@ -9,8 +9,9 @@ let count = 0
 let timer = 0
 
 const service = axios.create({
-  timeout: 12000,
+  timeout: 20000,
   baseURL: '/api'
+  // baseURL: 'https://47.101.63.12/exam_api'
 })
 
 service.interceptors.request.use(config => {
@@ -51,7 +52,7 @@ service.interceptors.response.use(res => {
     return Promise.reject(data)
   }
 
-  if(code === 403) {
+  if (code === 403) {
     clearTimeout(timer)
     timer = setTimeout(() => {
       Message({

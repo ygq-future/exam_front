@@ -8,6 +8,9 @@ import VueCookies from 'vue-cookies'
 
 Vue.config.productionTip = false
 
+Vue.prototype.$baseUrl = 'http://localhost:80'
+// Vue.prototype.$baseUrl = 'https://47.101.63.12/exam_api'
+
 Vue.use(ElementUI, { size: 'small', zIndex: 3000 })
 Vue.use(VueCookies)
 

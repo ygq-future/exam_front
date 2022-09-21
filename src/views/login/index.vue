@@ -72,8 +72,15 @@ export default {
     ...mapActions(['setUser']),
     login() {
       api.login(this.form).then(res => {
-        this.$message.success(res.message)
         let user = res.data
+
+        if (user.type === 2) {
+          this.$message.warning('你小子想法很危险!!!')
+          api.logout()
+          return
+        }
+
+        this.$message.success(res.message)
         delete user.roles
         this.setUser(user)
         cookies.set('user', JSON.stringify(user))
