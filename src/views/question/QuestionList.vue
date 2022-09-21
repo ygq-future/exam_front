@@ -34,7 +34,7 @@
             {{ getAnswer(scope.row) }}
           </template>
         </el-table-column>
-        <el-table-column prop="score" label="分数" align="center" width="50"/>
+        <el-table-column prop="score" label="分数" align="center" width="50" />
         <el-table-column prop="gmtModified" label="修改时间" align="center" />
         <el-table-column label="操作" align="center" width="250">
           <template slot-scope="scope">
@@ -142,7 +142,7 @@ export default {
     },
     getAnswer(row) {
       if (row.typeId === 4) {
-        return row.answer === 1 ? '正确' : '错误'
+        return row.answer === '1' ? '正确' : '错误'
       } else if (row.typeId === 1 || row.typeId === 2) {
         let arr = row.answer.split(',')
         return row.selects

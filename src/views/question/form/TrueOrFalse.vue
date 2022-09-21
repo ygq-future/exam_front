@@ -9,26 +9,11 @@
       <template #header>
         <div class="form">
           <h1>题目描述</h1>
-          <el-input
-            type="textarea"
-            @focus="temporarySave(true)"
-            :placeholder="questionData.tip || '请输入题目描述'"
-            v-model="questionData.title"
-          />
+          <el-input type="textarea" @focus="temporarySave(true)" :placeholder="questionData.tip || '请输入题目描述'" v-model="questionData.title" />
         </div>
         <div class="btns">
-          <el-button
-            size="medium"
-            :type="questionData.answer === '0' ? 'primary' : ''"
-            @click="questionData.answer = '0'"
-            >错误</el-button
-          >
-          <el-button
-            size="medium"
-            :type="questionData.answer === '1' ? 'primary' : ''"
-            @click="questionData.answer = '1'"
-            >正确
-          </el-button>
+          <el-button size="medium" :type="questionData.answer === '0' ? 'primary' : ''" @click="questionData.answer = '0'">错误</el-button>
+          <el-button size="medium" :type="questionData.answer === '1' ? 'primary' : ''" @click="questionData.answer = '1'">正确 </el-button>
         </div>
       </template>
     </Matrix>
