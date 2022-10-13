@@ -23,5 +23,11 @@ export default {
   },
   downloadUri(token) {
     return `/student/downloadExcel/${token}`
+  },
+  delete(id) {
+    return http({
+      method: 'delete',
+      url: `/student/${id}`
+    })
   }
 }

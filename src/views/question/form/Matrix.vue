@@ -37,7 +37,7 @@
       </el-header>
 
       <!-- 默认插槽 -->
-      <el-main>
+      <el-main style="overflow-y: auto; height: 300px">
         <slot></slot>
       </el-main>
     </el-container>

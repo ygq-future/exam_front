@@ -28,10 +28,14 @@
       <el-table :data="dataList" height="530px">
         <el-table-column prop="id" label="ID" width="50" align="center"></el-table-column>
         <el-table-column prop="typeName" label="题目类型" width="120" align="center"></el-table-column>
-        <el-table-column prop="title" align="center" label="题目标题"></el-table-column>
+        <el-table-column prop="title" align="center" label="题目标题">
+          <template slot-scope="scope">
+            <span v-html="scope.row.title"></span>
+          </template>
+        </el-table-column>
         <el-table-column align="center" label="答案">
           <template slot-scope="scope">
-            {{ getAnswer(scope.row) }}
+            <span v-html="getAnswer(scope.row)"></span>
           </template>
         </el-table-column>
         <el-table-column prop="score" label="分数" align="center" width="50" />

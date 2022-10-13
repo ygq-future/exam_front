@@ -18,13 +18,13 @@
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="danger" size="small" v-show="scope.row.locked === 0" @click="lock(scope.row.id)"
-              >锁定账户</el-button
-            >
+            <el-button type="warning" size="small" v-show="scope.row.locked === 0" @click="lock(scope.row.id)">锁定账户</el-button>
 
-            <el-button type="success" size="small" v-show="scope.row.locked !== 0" @click="lock(scope.row.id)"
-              >解锁账户</el-button
-            >
+            <el-button type="success" size="small" v-show="scope.row.locked !== 0" @click="lock(scope.row.id)">解锁账户</el-button>
+
+            <el-popconfirm style="margin-left: 10px" cancel-button-type="info" title="确认删除此教师吗?" @confirm="deleteTeacher(scope.row.id)">
+              <el-button slot="reference" type="danger" size="small">删除</el-button>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -60,6 +60,12 @@ export default {
     }
   }),
   methods: {
+    deleteTeacher(id) {
+      teacher.delete(id).then(res => {
+        this.$message.success(res.message)
+        this.getData()
+      })
+    },
     //请求数据
     async getData() {
       this.loading = true

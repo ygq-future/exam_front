@@ -24,5 +24,11 @@ export default {
       method: 'post',
       url: `/teacher/applyAuthority/${majorId}`
     })
+  },
+  delete(id) {
+    return http({
+      method: 'delete',
+      url: `/teacher/${id}`
+    })
   }
 }

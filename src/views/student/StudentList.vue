@@ -2,8 +2,9 @@
   <el-container v-loading="loading">
     <el-header class="header">
       <div class="item">
-        <el-button type="primary" @click="dialogVisible = true">批量导入</el-button>
-        <el-button type="success" @click="downloadExample">下载导入模板</el-button>
+        <!-- <el-button type="primary" @click="dialogVisible = true">批量导入</el-button>
+        <el-button type="success" @click="downloadExample">下载导入模板</el-button> -->
+        <el-button type="danger" @click="clearStudent">清空学生</el-button>
       </div>
 
       <div class="item">
@@ -27,11 +28,11 @@
     <el-main>
       <el-table :data="studentList" style="width: 100%" stripe height="500">
         <el-table-column prop="studentNo" label="学号" align="center" />
-        <el-table-column prop="name" label="姓名" align="center" />
+        <el-table-column prop="name" label="姓名" align="center" width="80" />
         <el-table-column prop="collegeName" label="学院" align="center" />
-        <el-table-column prop="clazzName" label="班级" align="center" />
-        <el-table-column prop="majorName" label="专业" align="center" />
-        <el-table-column label="账号状态" align="center">
+        <el-table-column prop="clazzName" label="班级" align="center" width="100" />
+        <el-table-column prop="majorName" label="专业" align="center" width="100" />
+        <el-table-column label="账号状态" align="center" width="100">
           <template slot-scope="scope">
             <el-tag type="info" v-show="scope.row.locked !== 0">已锁定</el-tag>
             <el-tag v-show="scope.row.locked === 0">未锁定</el-tag>
@@ -39,9 +40,12 @@
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <el-button type="danger" size="small" v-show="scope.row.locked === 0" @click="lock(scope.row.id)">锁定账户</el-button>
-
+            <el-button type="warning" size="small" v-show="scope.row.locked === 0" @click="lock(scope.row.id)">锁定账户</el-button>
             <el-button type="success" size="small" v-show="scope.row.locked !== 0" @click="lock(scope.row.id)">解锁账户</el-button>
+
+            <el-popconfirm style="margin-left: 10px" cancel-button-type="info" title="确认删除此学生吗?" @confirm="deleteStudent(scope.row.id)">
+              <el-button slot="reference" type="danger" size="small">删除</el-button>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -123,6 +127,28 @@ export default {
     }
   },
   methods: {
+    clearStudent() {
+      this.$confirm('确认清空所有学生吗?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.deleteStudent('all')
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消操作'
+          })
+        })
+    },
+    deleteStudent(id) {
+      student.delete(id).then(res => {
+        this.$message.success(res.message)
+        this.getStudent()
+      })
+    },
     beforeUpload(file) {
       const type = file.type
       if (type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || type === 'application/vnd.ms-excel') {

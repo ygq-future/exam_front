@@ -1,4 +1,3 @@
-<!-- 多选题表单 -->
 <template>
   <div>
     <el-button @click="init">修改题目</el-button>
@@ -9,13 +8,16 @@
       <template #header>
         <div class="form">
           <h1>题目描述</h1>
-          <el-input
+          <!-- <el-input
             type="textarea"
             @focus="temporarySave(true)"
             :placeholder="questionData.tip || '请输入题目描述'"
             v-model="questionData.title"
-          />
+          /> -->
         </div>
+      </template>
+      <template>
+        <Quill :content="questionData.title" @onEditorChange="changeText"></Quill>
       </template>
       <div class="form">
         <h1>答案</h1>
@@ -34,8 +36,10 @@ import util from './util.js'
 import Matrix from './Matrix.vue'
 import question from '@/api/question'
 import { Loading } from 'element-ui'
+import Quill from '@/components/Quill.vue'
 export default {
   props: ['id'],
+  components: { Quill, Matrix },
   data: () => ({
     questionData: {
       selects: []
@@ -43,6 +47,9 @@ export default {
     visible: false
   }),
   methods: {
+    changeText(content) {
+      this.questionData.title = content
+    },
     //初始化方法
     async init() {
       this.visible = true
@@ -123,8 +130,7 @@ export default {
         this.$refs.multipleTable.clearSelection()
       }
     }
-  },
-  components: { Matrix }
+  }
 }
 </script>
 

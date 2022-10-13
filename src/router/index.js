@@ -45,11 +45,6 @@ const routes = [
         name: 'questionList',
         component: () => import('@/views/question/QuestionList.vue')
       },
-      /* {
-        path: '/question-edit',
-        name: 'questionEdit',
-        component: () => import('@/views/question/QuestionEdit.vue')
-      }, */
       //试卷管理
       {
         path: '/paper-list',

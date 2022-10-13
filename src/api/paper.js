@@ -69,6 +69,12 @@ export default {
       params
     })
   },
+  subjectiveList() {
+    return http({
+      method: 'get',
+      url: '/major-exam/subjective'
+    })
+  },
   //修改状态
   changePushedPaperStatus(data) {
     return http({

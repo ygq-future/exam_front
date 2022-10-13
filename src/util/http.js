@@ -9,14 +9,18 @@ let count = 0
 let timer = 0
 
 const service = axios.create({
-  timeout: 20000,
+  timeout: 30000,
   baseURL: '/api'
-  // baseURL: 'https://47.101.63.12/exam_api'
+  // baseURL: 'http://10.20.35.159/exam_api'
 })
 
 service.interceptors.request.use(config => {
   config.headers['Content-Type'] = 'application/json;charset=utf8'
-  config.headers['X-XSRF-TOKEN'] = cookies.get('XSRF-TOKEN')
+  let xsrfToken = cookies.get('XSRF-TOKEN')
+  config.headers['X-XSRF-TOKEN'] = xsrfToken
+  if (!xsrfToken) {
+    config.headers['X-XSRF-TOKEN'] = 'xsrfToken'
+  }
   return config
 })
 

@@ -80,7 +80,7 @@ export default {
   },
   mounted() {
     this.findSubjectivePaper()
-    this.getPushedPaperList()
+    this.getSubjectiveList()
   },
   methods: {
     submitScoring() {
@@ -114,10 +114,10 @@ export default {
         this.loading = false
       })
     },
-    getPushedPaperList() {
+    getSubjectiveList() {
       this.loading = true
-      paper.getPushedPaper({ current: 1, size: 999, status: -1 }).then(res => {
-        this.paperList = res.data.rows
+      paper.subjectiveList().then(res => {
+        this.paperList = res.data
         this.paperList.forEach(item => {
           item.desc = item.examName + '#' + item.majorName + '#' + item.gmtCreate
         })
