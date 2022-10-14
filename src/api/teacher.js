@@ -13,18 +13,6 @@ export default {
       url: `/teacher/reverseLock/${teacherId}`
     })
   },
-  byMe() {
-    return http({
-      method: 'get',
-      url: '/teacher-major/byMe'
-    })
-  },
-  applyAuth(majorId) {
-    return http({
-      method: 'post',
-      url: `/teacher/applyAuthority/${majorId}`
-    })
-  },
   delete(id) {
     return http({
       method: 'delete',

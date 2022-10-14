@@ -8,13 +8,13 @@
         <div class="success">
           <i class="el-icon-success"></i>
           <span>及格人数:</span>
-          <span>1</span>
+          <span>{{ pass || 0 }}</span>
         </div>
 
         <div class="error">
           <i class="el-icon-error"></i>
           <span>不及格人数:</span>
-          <span>1</span>
+          <span>{{ tableData.length - pass || 0 }}</span>
         </div>
 
         <el-button type="primary" @click="exportData">导出数据</el-button>
@@ -64,7 +64,8 @@ export default {
         examUnique: ''
       },
       tableData: [],
-      loading: false
+      loading: false,
+      pass: 0
     }
   },
   mounted() {
@@ -84,6 +85,13 @@ export default {
       statistics.scoreList(this.page).then(res => {
         this.page.total = res.data.total
         this.tableData = res.data.rows
+
+        this.tableData.forEach(item => {
+          if (item.passed) {
+            this.pass++
+          }
+        })
+
         this.loading = false
       })
     },
@@ -95,7 +103,7 @@ export default {
           this.scoreList()
         }
         this.paperList.forEach(item => {
-          item.desc = item.examName + '#' + item.majorName + '#' + item.gmtCreate
+          item.desc = item.subjectName + '#' + item.name + '#' + item.gmtCreate
         })
       })
     },

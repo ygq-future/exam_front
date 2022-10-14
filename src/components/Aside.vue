@@ -1,20 +1,14 @@
 <template>
-  <el-menu
-    :default-openeds="openeds"
-    :collapse-transition="false"
-    router
-    :collapse="isCollapse"
-    :default-active="active"
-    :class="[isCollapse ? 'auto' : 'normal']"
-  >
+  <el-menu :default-openeds="openeds" :collapse-transition="false" router :collapse="isCollapse"
+    :default-active="active" :class="[isCollapse ? 'auto' : 'normal']">
     <div class="collapse" @click="isCollapse = !isCollapse">
       <i class="el-icon-set-up"></i>
     </div>
 
-    <el-menu-item index="/teacher-dashboard">
+    <!-- <el-menu-item index="/teacher-dashboard">
       <i class="el-icon-s-operation"></i>
       <span slot="title">仪表盘</span>
-    </el-menu-item>
+    </el-menu-item> -->
 
     <el-submenu index="person">
       <template slot="title">
@@ -59,7 +53,7 @@
         <span>系统管理</span>
       </template>
       <el-menu-item index="/role-authority">角色授权</el-menu-item>
-      <el-menu-item index="/admin-function">管理员功能</el-menu-item>
+      <!-- <el-menu-item index="/admin-function">管理员功能</el-menu-item> -->
     </el-submenu>
   </el-menu>
 </template>

@@ -38,12 +38,10 @@
       <div class="box">
         <div class="item" v-for="item in scoringQues" :key="item.id">
           <span class="title">{{ item.title }} 分数:{{ item.score }}</span>
-
           <div class="formitem">
             <span>学生回答</span>
             <el-input type="textarea" :value="item.answer || '空白'" resize="none" :rows="5" />
           </div>
-
           <div class="formitem">
             <span>分数</span>
             <el-input style="width: 100px" type="number" min="0" v-model.number="item.givenScore" placeholder="请输入评分" />
@@ -105,8 +103,6 @@ export default {
       paper.findSubjectivePaper(this.page).then(res => {
         this.recordList = res.data.rows
         this.page.total = res.data.total
-        this.page.current = res.data.current
-        this.page.size = res.data.size
 
         this.recordList.forEach(item => {
           item.examObj = JSON.parse(item.exam)
@@ -119,7 +115,7 @@ export default {
       paper.subjectiveList().then(res => {
         this.paperList = res.data
         this.paperList.forEach(item => {
-          item.desc = item.examName + '#' + item.majorName + '#' + item.gmtCreate
+          item.desc = item.subjectName + '#' + item.name + '#' + item.gmtCreate
         })
         this.loading = false
       })

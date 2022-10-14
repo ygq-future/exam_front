@@ -51,36 +51,35 @@ export default {
   push(data) {
     return http({
       method: 'post',
-      url: '/major-exam',
+      url: '/examination',
       data
     })
   },
-  cancelPush(examUnique) {
+  delExamination(id) {
     return http({
       method: 'delete',
-      url: '/major-exam/' + examUnique
+      url: `/examination/${id}`
     })
   },
   //获取已经推送至专业的试卷列表
   getPushedPaper(params = {}) {
     return http({
       method: 'get',
-      url: '/major-exam',
+      url: '/examination',
       params
     })
   },
   subjectiveList() {
     return http({
       method: 'get',
-      url: '/major-exam/subjective'
+      url: '/examination/subjective'
     })
   },
   //修改状态
-  changePushedPaperStatus(data) {
+  changePushedPaperStatus(id, status) {
     return http({
       method: 'patch',
-      url: '/major-exam/' + data.id,
-      data
+      url: `/examination/${id}/${status}`
     })
   },
   //获取所有待打分的主观题试卷

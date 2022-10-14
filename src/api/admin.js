@@ -44,18 +44,5 @@ export default {
       method: 'post',
       url: '/admin/offline/' + login
     })
-  },
-  applyList(params) {
-    return http({
-      method: "get",
-      url: "/teacher-major",
-      params
-    })
-  },
-  reverseStatus(id) {
-    return http({
-      method: "patch",
-      url: "/teacher-major/reverseStatus/" + id
-    })
   }
 }

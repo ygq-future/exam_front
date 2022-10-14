@@ -10,27 +10,15 @@
       <el-descriptions-item label="注册时间">{{ user.userInfo.gmtCreate }}</el-descriptions-item>
     </el-descriptions>
     <div class="box">
-      <el-card class="top">
-        <el-alert title="我管理的专业" type="info" show-icon center :closable="false" />
-        <el-empty v-if="user.type === 0" description="拥有所有专业管理权">
-          <template #image>
-            <i style="font-size: 50px; color: #67c23a" class="el-icon-success"></i>
-          </template>
-        </el-empty>
-        <div class="list" v-else>
-          <div class="oper">
-            <el-button type="primary" size="mini" @click="applyDialog = true">申请专业管理</el-button>
-          </div>
-          <el-divider></el-divider>
-          <div class="content">
-            <el-tag v-for="item in byMeMajors" :key="item.id">{{ item.name }}</el-tag>
-          </div>
-        </div>
+      <el-card v-if="user.type == 0" class="offline">
+        <el-alert title="人员下线" type="info" show-icon center :closable="false" />
+        <el-autocomplete v-model="selected" :fetch-suggestions="querySearch" placeholder="请输入账号"
+          :trigger-on-focus="false" @select="select"></el-autocomplete>
+        <el-button type="danger" size="small" @click="offline">下线</el-button>
       </el-card>
 
       <el-card class="bottom">
         <el-alert title="我管理的试卷" type="info" show-icon center :closable="false" />
-
         <el-table :data="papers" style="width: 100%" height="260">
           <el-table-column fixed align="center" type="index" width="100" label="编号" />
           <el-table-column align="center" prop="name" label="试卷名称" />
@@ -41,16 +29,8 @@
           <el-table-column align="center" fixed="right" width="300" label="操作">
             <template slot-scope="scope">
               <el-button type="success" @click="$router.push(`/paper-edit?id=${scope.row.id}`)">编辑</el-button>
-              <el-popconfirm
-                style="margin: 0 10px"
-                @confirm="delExam(scope.row.id)"
-                confirm-button-text="确认"
-                cancel-button-text="取消"
-                icon="el-icon-info"
-                cancel-button-type="info"
-                icon-color="red"
-                title="确定删除吗？"
-              >
+              <el-popconfirm style="margin: 0 10px" @confirm="delExam(scope.row.id)" confirm-button-text="确认"
+                cancel-button-text="取消" icon="el-icon-info" cancel-button-type="info" icon-color="red" title="确定删除吗？">
                 <el-button slot="reference" type="danger">删除</el-button>
               </el-popconfirm>
               <el-button type="primary" @click="openPush(scope.row.id)">推送</el-button>
@@ -59,16 +39,6 @@
         </el-table>
       </el-card>
     </div>
-
-    <el-dialog :close-on-click-modal="false" title="申请权限" center :visible.sync="applyDialog" width="300px">
-      <el-select v-model="selected" clearable>
-        <el-option v-for="item in majorList" :key="item.id" :value="item.id" :label="item.name" />
-      </el-select>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="applyDialog = false">取 消</el-button>
-        <el-button type="primary" @click="applyAuth">确 定</el-button>
-      </span>
-    </el-dialog>
 
     <el-dialog title="推送试卷" center :visible.sync="pushDialog" width="400px">
       <div class="pushItem">
@@ -85,28 +55,25 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import teacher from '@/api/teacher'
 import paper from '@/api/paper'
-import major from '@/api/major'
+import admin from '@/api/admin'
 
 export default {
   data() {
     return {
       selected: '',
       pushDialog: false,
-      applyDialog: false,
-      byMeMajors: [],
       papers: [],
-      majorList: [],
       loading: false,
       form: {
         examId: 0,
         majorId: ''
-      }
+      },
+      timer: 0,
+      selectObj: null,
     }
   },
   mounted() {
-    this.getByMeMajor()
     this.getPapers()
     this.getMajorList()
   },
@@ -122,7 +89,7 @@ export default {
         return
       }
 
-      if(!this.form.majorId || this.form.majorId === '') {
+      if (!this.form.majorId || this.form.majorId === '') {
         this.$message.warning('请先选择要推送的专业')
         return
       }
@@ -130,37 +97,6 @@ export default {
       paper.push(this.form).then(res => {
         this.$message.success(res.message)
         this.form.majorId = ''
-      })
-    },
-    applyAuth() {
-      if (!this.selected || this.selected === '') {
-        this.$message.warning('请先选择要申请的专业!')
-        return
-      }
-
-      teacher.applyAuth(this.selected).then(() => {
-        this.$message.success('申请成功, 等待管理员审核!')
-        this.applyDialog = false
-      })
-    },
-    getMajorList() {
-      major.majorList().then(res => {
-        this.majorList = res.data
-      })
-    },
-    getByMeMajor() {
-      teacher.byMe().then(res => {
-        this.byMeMajors = res.data
-        let temp = []
-        this.byMeMajors.forEach(item => {
-          temp.push(JSON.stringify({ id: item.majorId, name: item.majorName }))
-        })
-        //去重
-        temp = Array.from(new Set(temp))
-        this.byMeMajors = []
-        temp.forEach(item => {
-          this.byMeMajors.push(JSON.parse(item))
-        })
       })
     },
     getPapers() {
@@ -175,6 +111,36 @@ export default {
         this.$message.success(res.message)
         this.getPapers()
       })
+    },
+    offline() {
+      if (this.selectObj) {
+        admin.offline(this.selectObj.unique).then(res => {
+          this.$message.success(res.message)
+          this.selected = ''
+        })
+      }
+    },
+    select(value) {
+      this.selectObj = value
+    },
+    querySearch(queryString, cb) {
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
+        admin.accounts().then(res => {
+          let data = res.data
+          data.forEach(user => {
+            user.value = user.studentNo ? user.studentNo : user.teacherNo
+            user.unique = user.value
+            user.value = `${user.name}#${user.value}`
+          })
+          const result =
+            data.filter(item => {
+              return item.value.indexOf(queryString) >= 0
+            }) || []
+          cb(result)
+        })
+        // 调用 callback 返回建议列表的数据
+      }, 400)
     }
   },
   computed: {
@@ -235,7 +201,6 @@ export default {
   .box {
     height: 100%;
     display: flex;
-    flex-direction: column;
   }
 }
 
@@ -247,5 +212,19 @@ export default {
 :deep(.el-descriptions-item__label) {
   display: flex;
   align-items: center;
+}
+
+.offline {
+  width: 300px;
+  margin-bottom: 15px;
+
+  .el-button {
+    margin-top: 15px;
+    width: 100%;
+  }
+
+  .el-autocomplete {
+    width: 100%;
+  }
 }
 </style>
