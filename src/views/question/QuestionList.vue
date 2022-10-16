@@ -20,7 +20,7 @@
       </div>
 
       <div class="menu">
-        <AddQuestion @update="getDataList" />
+        <el-button @click="addQuestionForm">添加题目</el-button>
       </div>
     </el-header>
     <!-- 题目表格区域 -->
@@ -42,14 +42,9 @@
         <el-table-column prop="gmtModified" label="修改时间" align="center" />
         <el-table-column label="操作" align="center" width="250">
           <template slot-scope="scope">
-            <!-- 通过题目类型决定打开哪一个表单 -->
             <div class="buttons">
-              <!-- 表单按钮 -->
-              <ShortAnswerQuestion :id="scope.row.id" v-show="scope.row.typeId === 5" @update="getDataList" />
-              <TrueOrFalse :id="scope.row.id" v-show="scope.row.typeId === 4" @update="getDataList" />
-              <GapFilling :id="scope.row.id" v-show="scope.row.typeId === 3" @update="getDataList" />
-              <SingleChoice :id="scope.row.id" v-show="scope.row.typeId === 1" @update="getDataList" />
-              <MultipleChoice :id="scope.row.id" v-show="scope.row.typeId === 2" @update="getDataList" />
+              <!-- 显示表单 -->
+              <el-button @click="openEditForm(scope.row)">修改题目</el-button>
               <el-popconfirm cancel-button-type="info" title="确认删除此题目吗?" @confirm="del(scope.row.id)">
                 <el-button slot="reference" size="small" type="danger">删除题目</el-button>
               </el-popconfirm>
@@ -57,21 +52,16 @@
           </template>
         </el-table-column>
       </el-table>
+      <!-- 编辑题目组件 -->
+      <QuestionEditForm :visible="QuestionEditStatus" @close="close" :questionId="questionId" @update="getDataList">
+      </QuestionEditForm>
+      <AddQuestionForm :visible="QuestionAddStatus" @close="addQuestionClose" />
     </el-main>
     <el-footer>
       <el-footer height="50">
-        <el-pagination
-          style="text-align: center"
-          background
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="page.total"
-          :current-page="page.current"
-          :page-size="page.size"
-          :page-sizes="[10, 20, 30, 40]"
-          @size-change="sizeChange"
-          @current-change="currentChange"
-        >
-          <!-- @current-change="getData" @size-change="getData" -->
+        <el-pagination style="text-align: center" background layout="total, sizes, prev, pager, next, jumper"
+          :total="page.total" :current-page="page.current" :page-size="page.size" :page-sizes="[10, 20, 30, 40]"
+          @size-change="sizeChange" @current-change="currentChange">
         </el-pagination>
       </el-footer>
     </el-footer>
@@ -80,12 +70,8 @@
 
 <script>
 import question from '@/api/question'
-import MultipleChoice from './form/MultipleChoice.vue'
-import SingleChoice from './form/SingleChoice.vue'
-import GapFilling from './form/GapFilling.vue'
-import TrueOrFalse from './form/TrueOrFalse.vue'
-import ShortAnswerQuestion from './form/ShortAnswerQuestion.vue'
-import AddQuestion from './form/CreateQuestion.vue'
+import QuestionEditForm from './QuestionEditForm.vue'
+import AddQuestionForm from './AddQuestionForm.vue'
 export default {
   data: () => ({
     loading: false,
@@ -100,7 +86,11 @@ export default {
       total: 0
     },
     questionType: [],
-    timer: 0
+    timer: 0,
+    //编辑题目表单展示状态
+    QuestionEditStatus: false,
+    questionId: null,
+    QuestionAddStatus: false
   }),
   methods: {
     //获取题目列表
@@ -155,6 +145,21 @@ export default {
           .join(',')
       }
       return row.answer
+    },
+    openEditForm(row) {
+      //打开编辑时
+      this.questionId = row.id
+      this.QuestionEditStatus = !this.QuestionEditStatus
+    },
+    //关闭弹出窗口
+    close() {
+      this.QuestionEditStatus = false
+    },
+    addQuestionForm() {
+      this.QuestionAddStatus = true
+    },
+    addQuestionClose() {
+      this.QuestionAddStatus = false
     }
   },
   //页面初始化事件
@@ -162,7 +167,7 @@ export default {
     this.getType()
     this.getDataList()
   },
-  components: { MultipleChoice, SingleChoice, GapFilling, TrueOrFalse, ShortAnswerQuestion, AddQuestion }
+  components: { QuestionEditForm, AddQuestionForm }
 }
 </script>
 <style scoped lang="scss">
@@ -171,22 +176,27 @@ export default {
   justify-content: center;
   gap: 15px;
 }
+
 .question {
   .el-header {
     display: flex;
     gap: 10px;
     justify-content: space-between;
+
     .menu {
       display: flex;
       gap: 10px;
     }
   }
 }
+
 .input-menu {
   width: 90vmin;
+
   .el-select {
     width: 18vmin;
   }
+
   .left {
     margin-left: 20px;
     padding-right: 0px;

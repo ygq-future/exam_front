@@ -1,71 +1,71 @@
-import http from '@/util/http'
+import http from "@/util/http";
 
 export default {
   getList(params) {
     return http({
-      url: '/question',
-      method: 'get',
-      params
-    })
+      url: "/question",
+      method: "get",
+      params,
+    });
   },
   //获取类型
   getType() {
-    return http.get('/question-type')
+    return http.get("/question-type");
   },
   //根据ID查询
-  queryByID: id =>
+  queryByID: (id) =>
     http({
-      url: `/question/${id}`
+      url: `/question/${id}`,
     }),
   //修改选择题选项
   editQuestion(id, data) {
     return http({
       url: `select-question/${id}`,
-      method: 'patch',
-      data
-    })
+      method: "patch",
+      data,
+    });
   },
   //删除选项
   delQuestion(id) {
     return http({
       url: `select-question/${id}`,
-      method: 'delete'
-    })
+      method: "delete",
+    });
   },
   //添加选择性
   addQuestion(data) {
     return http({
-      url: '/select-question',
-      method: 'post',
-      data
-    })
+      url: "/select-question",
+      method: "post",
+      data,
+    });
   },
-  changeQuestion(data) {
+  changeQuestion(id, data) {
     return http({
-      url: `question/${data.id}`,
-      method: 'put',
-      data
-    })
+      url: `question/${id}`,
+      method: "put",
+      data,
+    });
   },
   //批量导入题目到试卷
   batchImport(data) {
     return http({
-      method: 'post',
-      url: '/question/batchImport',
-      data
-    })
+      method: "post",
+      url: "/question/batchImport",
+      data,
+    });
   },
-  add(data){
+  add(data) {
     return http({
-      url:'/question',
-      method:'post',
-      data
-    })
+      url: "/question",
+      method: "post",
+      data,
+    });
   },
-  del(id){
+  del(id) {
     return http({
-      url:`/question/${id}`,
-      method:'delete'
-    })
-  }
-}
+      url: `/question/${id}`,
+      method: "delete",
+    });
+  },
+};
