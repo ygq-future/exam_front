@@ -3,7 +3,13 @@
     <el-card class="card" v-loading="majorLoading">
       <el-alert title="学院列表信息" type="info" show-icon center :closable="false" />
       <el-button type="primary" size="mini" style="margin: 15px 0" @click="add(null)">添加学院</el-button>
-      <el-tree :data="collegeList" :props="{ label: 'name' }" node-key="id" default-expand-all :expand-on-click-node="false">
+      <el-tree
+        :data="collegeList"
+        :props="{ label: 'name' }"
+        node-key="id"
+        default-expand-all
+        :expand-on-click-node="false"
+      >
         <div class="custom-tree-node" slot-scope="{ node, data }">
           <span>{{ node.label }}</span>
           <span>
@@ -28,8 +34,13 @@
 
     <el-card class="card" v-loading="subjectLoading">
       <el-alert title="学科信息列表" type="info" show-icon center :closable="false" />
-      <el-button type="primary" style="margin: 15px 0" @click="openAdd">添加</el-button>
-      <el-table :data="subjectList" style="width: 100%" height="400">
+      <div class="btng">
+        <el-button type="primary" style="margin: 15px 0" @click="openAdd">添加</el-button>
+        <el-select @change="getSubjectList" v-model="query.majorId" placeholder="选择专业">
+          <el-option v-for="item in majorList" :key="item.id" :value="item.id" :label="item.name" />
+        </el-select>
+      </div>
+      <el-table :data="subjectList" style="width: 100%" height="500">
         <el-table-column prop="id" label="编号" align="center" />
         <el-table-column prop="name" label="学科" align="center" />
         <el-table-column prop="gmtCreate" label="操作" align="center">
@@ -68,10 +79,13 @@
 
     <el-dialog :close-on-click-modal="false" title="编辑学科" :visible.sync="subjectDialog" width="400px" center>
       <el-form class="mybox" inline>
+        <el-form-item label="专业">
+          <el-select @change="changeMajor" v-model="form.majorId" clearable placeholder="请选择专业">
+            <el-option v-for="item in majorList" :key="item.id" :value="item.id" :label="item.name" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="名称">
           <el-input placeholder="请输入学科名称" v-model="form.name" />
-          <!-- 隐藏input框,防止回车提交表单 -->
-          <input type="text" style="display: none" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -97,14 +111,25 @@ export default {
       subjectList: [],
       form: {},
       title: '',
-      subjectStatus: 0
+      subjectStatus: 0,
+      majorList: [],
+      query: {
+        majorId: 0
+      }
     }
   },
   mounted() {
     this.getCollegeList()
-    this.getSubjectList()
+    this.getMajorList()
   },
   methods: {
+    changeMajor(val) {
+      this.majorList.forEach(item => {
+        if (item.id === val) {
+          this.form.majorName = item.name
+        }
+      })
+    },
     openEdit(data) {
       this.subjectStatus = 1
       this.form.id = data.id
@@ -135,9 +160,18 @@ export default {
         this.getSubjectList()
       })
     },
+    getMajorList() {
+      major.majorList().then(res => {
+        this.majorList = res.data
+        if (this.majorList.length > 0) {
+          this.query.majorId = this.majorList[0].id
+          this.getSubjectList()
+        }
+      })
+    },
     getSubjectList() {
       this.subjectLoading = true
-      subject.subjectList().then(res => {
+      subject.subjectList(this.query.majorId).then(res => {
         this.subjectList = res.data
         this.subjectLoading = false
       })
@@ -242,6 +276,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.btng {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .el-select {
+    width: 200px;
+  }
+}
+
 .content {
   width: 100%;
   display: flex;
@@ -274,6 +317,7 @@ export default {
 .mybox {
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }

@@ -10,7 +10,7 @@
         <div class="item" v-for="(item, idx) in questions[type.name]" :key="item.id">
           <!-- question title -->
           <div style="margin-bottom: 10px">
-            <span>{{ `${idx + 1}、 ${item.title}` }}</span>
+            <span>{{ `${idx + 1}、 ` }} <span style="display: inline-block" v-html="item.title"></span></span>
             <span style="padding: 0 10px; color: gray; font-size: 14px">({{ item.score }}分)</span>
             <el-popconfirm title="确定删除此题目的关联吗?" @confirm="cancelQues(item.id)" cancel-button-type="info">
               <i slot="reference" v-if="enableExam" class="el-icon-delete delete"></i>
@@ -21,7 +21,7 @@
           <div class="selects" v-if="item.typeId === 1">
             <div v-for="(select, sidx) in item.selects" :key="sidx">
               {{ `${items[sidx]}、` }}
-              <el-tag :type="item.answer == select.id ? 'success' : 'info'">{{ select.description }}</el-tag>
+              <el-tag :type="item.answer == select.id ? 'success' : 'info'" v-html="select.description"> </el-tag>
             </div>
           </div>
 
@@ -29,13 +29,17 @@
           <div class="selects" v-if="item.typeId === 2">
             <div v-for="(select, sidx) in item.selects" :key="sidx">
               {{ `${items[sidx]}、` }}
-              <el-tag :type="item.answer.split(',').includes(select.id + '') ? 'success' : 'info'">{{ select.description }}</el-tag>
+              <el-tag
+                v-html="select.description"
+                :type="item.answer.split(',').includes(select.id + '') ? 'success' : 'info'"
+              ></el-tag>
             </div>
           </div>
 
           <!-- fill question -->
           <div v-if="item.typeId === 3">
-            答案: <el-tag type="success">{{ item.answer }}</el-tag>
+            答案:
+            <el-tag type="success" v-html="item.answer"> </el-tag>
           </div>
 
           <!-- if question -->
@@ -44,9 +48,7 @@
           </div>
 
           <!-- answer question -->
-          <div v-if="item.typeId === 5">
-            示例答案: <el-tag type="success">{{ item.answer }}</el-tag>
-          </div>
+          <div v-if="item.typeId === 5">示例答案: <el-tag type="success" v-html="item.answer"></el-tag></div>
         </div>
       </div>
     </div>
@@ -134,5 +136,9 @@ export default {
       margin-bottom: 10px !important;
     }
   }
+}
+
+.el-tag {
+  height: fit-content;
 }
 </style>

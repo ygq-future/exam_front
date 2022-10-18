@@ -7,7 +7,21 @@
         <el-alert title="修改试卷信息" type="info" show-icon center :closable="false" />
         <el-form>
           <el-input v-model="form.name" placeholder="试卷名称"></el-input>
-          <el-select clearable @change="onChange" style="width: 100%; margin-bottom: 15px" v-model="form.subjectId" placeholder="选择学科">
+          <el-select
+            style="margin-bottom: 15px; width: 100%"
+            v-model="query.majorId"
+            placeholder="选择专业"
+            @change="getSubjectList"
+          >
+            <el-option v-for="item in majorList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
+          <el-select
+            clearable
+            @change="onChange"
+            style="width: 100%; margin-bottom: 15px"
+            v-model="form.subjectId"
+            placeholder="选择学科"
+          >
             <el-option v-for="item in subjectList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
           <el-input v-model.number="form.duration" type="number" placeholder="考试时长"></el-input>
@@ -64,7 +78,14 @@
             </el-radio-group>
           </div>
 
-          <el-input resize="none" :rows="20" type="textarea" placeholder="请输入内容" @input="analyze" v-model="content" />
+          <el-input
+            resize="none"
+            :rows="20"
+            type="textarea"
+            placeholder="请输入内容"
+            @input="analyze"
+            v-model="content"
+          />
         </div>
 
         <el-divider direction="vertical"></el-divider>
@@ -87,6 +108,7 @@ import api from '@/api/paper'
 import question from '@/api/question'
 import subject from '@/api/subject'
 import PaperShow from '@/components/PaperShow'
+import major from '@/api/major'
 
 export default {
   components: { PaperShow },
@@ -106,6 +128,9 @@ export default {
         duration: 0,
         subjectId: ''
       },
+      query: {
+        majorId: ''
+      },
       //已选择的题目名称(用于添加关联题目)
       selected: '',
       //题目类型,用于解析模板的时候要用来查询typeId
@@ -121,6 +146,11 @@ export default {
         msg: '错误的表达式, 请检查格式!',
         value: false
       },
+      majorList: [],
+      qType: '$',
+      qTitle: '<>',
+      qItem: '@',
+      qAnswer: '#',
       //提示
       toptip: `题目内容请不要出现这些特殊字符: '<>', '#', '@', '$',
       如遇见必须要出现这些字符的题目,请去题目管理中添加`,
@@ -134,7 +164,8 @@ export default {
 #B
 
 $多选题$3
-<> 你做错了什么?
+<> 你做错
+了什么?
 @A 我呼吸错了
 @B 我没错啊!
 @C 我哪都错了
@@ -158,6 +189,7 @@ $简答题$10
   mounted() {
     this.id = Number(this.$route.query.id) || 0
     this.getById()
+    this.getMajorList()
   },
   methods: {
     onChange(id) {
@@ -255,7 +287,7 @@ $简答题$10
       //临时变量, 用来存储正则匹配结果
       let match
       //匹配正则并获得题型
-      const pattern = new RegExp('\\$(.*)\\$')
+      const pattern = new RegExp(`\\${this.qType}(.*)\\${this.qType}`)
       while ((match = pattern.exec(str))) {
         let fullWord = match[0]
         let preciseWord = match[1]
@@ -486,8 +518,17 @@ $简答题$10
         this.getById()
       })
     },
+    getMajorList() {
+      major.majorList().then(res => {
+        this.majorList = res.data
+        if (this.majorList.length > 0) {
+          this.query.majorId = this.majorList[0].id
+          this.getSubjectList()
+        }
+      })
+    },
     getSubjectList() {
-      subject.subjectList().then(res => {
+      subject.subjectList(this.query.majorId).then(res => {
         this.subjectList = res.data
       })
     },
@@ -497,7 +538,6 @@ $简答题$10
         this.paper = res.data
         let { name, subjectName, duration, subjectId } = this.paper
         this.form = { name, subjectName, duration, subjectId }
-        this.getSubjectList()
         this.loading = false
       })
       question.getType().then(res => {
@@ -567,7 +607,7 @@ $简答题$10
 }
 
 .info {
-  width: 250px;
+  width: 350px;
   margin-bottom: 15px;
 
   .el-input {

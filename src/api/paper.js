@@ -97,5 +97,13 @@ export default {
       url: '/exam-record/subjective/' + data.id,
       data
     })
+  },
+  //设置阅卷人
+  setExaminer(data) {
+    return http({
+      method: 'put',
+      url: '/examination/' + data.id,
+      data
+    })
   }
 }

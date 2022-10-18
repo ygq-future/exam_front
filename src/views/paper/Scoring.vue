@@ -44,7 +44,13 @@
           </div>
           <div class="formitem">
             <span>分数</span>
-            <el-input style="width: 100px" type="number" min="0" v-model.number="item.givenScore" placeholder="请输入评分" />
+            <el-input
+              style="width: 100px"
+              type="number"
+              min="0"
+              v-model.number="item.givenScore"
+              placeholder="请输入评分"
+            />
           </div>
         </div>
       </div>

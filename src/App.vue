@@ -12,7 +12,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   overflow: hidden;
 }
 .el-dialog {
@@ -27,5 +27,9 @@ body {
 
 .el-dialog__body {
   padding-bottom: 0 !important;
+}
+
+p {
+  margin: 0;
 }
 </style>

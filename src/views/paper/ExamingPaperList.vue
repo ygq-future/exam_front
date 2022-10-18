@@ -15,6 +15,7 @@
         <el-table-column align="center" prop="name" label="考试名称" />
         <el-table-column align="center" prop="subjectName" label="科目名称" />
         <el-table-column align="center" prop="operator" label="操作人" />
+        <el-table-column align="center" prop="examiner" label="阅卷人" />
         <el-table-column align="center" prop="gmtCreate" label="推送时间" />
         <el-table-column align="center" prop="status" label="状态" width="100">
           <template slot-scope="scope">
@@ -53,6 +54,7 @@
 
             <el-popconfirm
               @confirm="cancelPush(scope.row)"
+              style="margin-right: 10px"
               confirm-button-text="确认"
               cancel-button-text="取消"
               icon="el-icon-info"
@@ -62,6 +64,8 @@
             >
               <el-button slot="reference" type="text">删除</el-button>
             </el-popconfirm>
+
+            <el-button type="text" @click="openDialog(scope.row.id)">设置阅卷人</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -79,17 +83,31 @@
       :total="page.total"
     >
     </el-pagination>
+
+    <el-dialog :close-on-click-modal="false" title="设置阅卷人" center :visible.sync="dialogVisible" width="300px">
+      <div class="box">
+        <el-select clearable v-model="form.teacherId" placeholder="请选择阅卷教师">
+          <el-option v-for="item in teacherList" :label="item.name" :value="item.id" :key="item.id"></el-option>
+        </el-select>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submit">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import paper from '@/api/paper'
 import PaperShow from '@/components/PaperShow'
+import teacher from '@/api/teacher'
 
 export default {
   components: { PaperShow },
   data() {
     return {
+      dialogVisible: false,
       loading: false,
       page: {
         current: 1,
@@ -104,13 +122,32 @@ export default {
         { value: 0, label: '准备开考' },
         { value: 1, label: '考试中' },
         { value: -1, label: '已结束' }
-      ]
+      ],
+      teacherList: [],
+      form: {
+        teacherId: 0,
+        examiner: ''
+      }
     }
   },
   mounted() {
     this.getPushedPaperList()
+    this.getTeacherList()
   },
   methods: {
+    openDialog(id) {
+      this.form.teacherId = this.teacherList[0]?.id
+      this.form.examiner = this.teacherList[0]?.name
+      this.form.id = id
+      this.dialogVisible = true
+    },
+    submit() {
+      paper.setExaminer(this.form).then(res => {
+        this.$message.success(res.message)
+        this.dialogVisible = false
+        this.getPushedPaperList()
+      })
+    },
     getTagType(status) {
       if (status === 0) {
         return 'primary'
@@ -131,6 +168,11 @@ export default {
       paper.changePushedPaperStatus(id, 1).then(res => {
         this.$message.success(res.message)
         this.getPushedPaperList()
+      })
+    },
+    getTeacherList() {
+      teacher.getList({ current: 1, size: 100 }).then(res => {
+        this.teacherList = res.data.rows
       })
     },
     getPushedPaperList() {
@@ -170,6 +212,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .card {
   margin: 15px 0;
 }

@@ -21,10 +21,10 @@ export default {
       url: `/subject/${id}`
     })
   },
-  subjectList() {
+  subjectList(majorId) {
     return http({
       method: 'get',
-      url: `/subject`
+      url: `/subject?majorId=${majorId}`
     })
   }
 }
